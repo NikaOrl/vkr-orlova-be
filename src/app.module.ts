@@ -8,9 +8,13 @@ import { MarksController } from './marks/marks.controller';
 import { StudentsController } from './students/students.controller';
 import { TeachersController } from './teachers/teachers.controller';
 import { LoginController } from './login/login.controller';
+import { KnexService } from './knex/knex.service';
+import { KnexModule } from './knex/knex.module';
+
+import knexConfig from './knex/knex.config';
 
 @Module({
-  imports: [],
+  imports: [KnexModule.register(knexConfig)],
   controllers: [
     AppController,
     DisciplinesController,
@@ -21,6 +25,13 @@ import { LoginController } from './login/login.controller';
     TeachersController,
     LoginController,
   ],
-  providers: [AppService],
+  providers: [
+    AppService,
+    KnexService,
+    {
+      provide: 'CONFIG_OPTIONS',
+      useValue: knexConfig,
+    },
+  ],
 })
 export class AppModule {}
