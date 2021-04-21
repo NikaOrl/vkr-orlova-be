@@ -11,6 +11,7 @@ import { LoginController } from './login/login.controller';
 import { TeachersService } from './teachers/teachers.service';
 import { KnexService } from './knex/knex.service';
 import { KnexModule } from './knex/knex.module';
+import { StudentsService } from './students/students.service';
 
 import knexConfig from './knex/knex.config';
 
@@ -34,6 +35,7 @@ import knexConfig from './knex/knex.config';
       provide: 'CONFIG_OPTIONS',
       useValue: knexConfig,
     },
+    StudentsService,
   ],
 })
 export class AppModule {}
