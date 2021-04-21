@@ -8,6 +8,7 @@ import { MarksController } from './marks/marks.controller';
 import { StudentsController } from './students/students.controller';
 import { TeachersController } from './teachers/teachers.controller';
 import { LoginController } from './login/login.controller';
+import { TeachersService } from './teachers/teachers.service';
 import { KnexService } from './knex/knex.service';
 import { KnexModule } from './knex/knex.module';
 
@@ -27,6 +28,7 @@ import knexConfig from './knex/knex.config';
   ],
   providers: [
     AppService,
+    TeachersService,
     KnexService,
     {
       provide: 'CONFIG_OPTIONS',
