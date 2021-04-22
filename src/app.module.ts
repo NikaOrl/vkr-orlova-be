@@ -13,6 +13,7 @@ import { KnexService } from './knex/knex.service';
 import { KnexModule } from './knex/knex.module';
 import { StudentsService } from './students/students.service';
 import { DisciplinesService } from './disciplines/disciplines.service';
+import { GroupsService } from './groups/groups.service';
 
 import knexConfig from './knex/knex.config';
 
@@ -38,6 +39,7 @@ import knexConfig from './knex/knex.config';
     },
     StudentsService,
     DisciplinesService,
+    GroupsService,
   ],
 })
 export class AppModule {}
