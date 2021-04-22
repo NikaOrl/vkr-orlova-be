@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { KnexService } from '../knex/knex.service';
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
 const bcrypt = require('bcryptjs');
 
 @Injectable()
@@ -11,13 +10,10 @@ export class TeachersService {
   async getAll() {
     const knex = this.knexService.getKnex();
 
-    return (
-      knex
-        .from('teachers')
-        // .select(['firstName', 'lastName', 'id', 'email', 'isAdmin']);
-        .select(['firstName', 'lastName', 'id', 'email', 'isAdmin', 'deleted'])
-        .andWhere('deleted', false)
-    );
+    return knex
+      .from('teachers')
+      .select(['firstName', 'lastName', 'id', 'email', 'isAdmin', 'deleted'])
+      .andWhere('deleted', false);
   }
 
   async updateTeacher(id, data) {
@@ -48,8 +44,7 @@ export class TeachersService {
   async deleteTeachers(ids: Array<string>) {
     const knex = this.knexService.getKnex();
 
-    return knex('teachers').whereIn('id', ids).update('deleted', true); // in case of deleted flag
-    // .del(); // in case of real deleting
+    return knex('teachers').whereIn('id', ids).update('deleted', true);
   }
 
   async createTeachers(teacherData) {
