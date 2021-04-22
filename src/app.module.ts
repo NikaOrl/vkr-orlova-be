@@ -15,6 +15,7 @@ import { StudentsService } from './students/students.service';
 import { DisciplinesService } from './disciplines/disciplines.service';
 import { GroupsService } from './groups/groups.service';
 import { JobsService } from './jobs/jobs.service';
+import { MarksService } from './marks/marks.service';
 
 import knexConfig from './knex/knex.config';
 
@@ -42,6 +43,7 @@ import knexConfig from './knex/knex.config';
     DisciplinesService,
     GroupsService,
     JobsService,
+    MarksService,
   ],
 })
 export class AppModule {}
