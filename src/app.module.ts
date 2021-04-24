@@ -17,11 +17,13 @@ import { GroupsService } from './groups/groups.service';
 import { JobsService } from './jobs/jobs.service';
 import { MarksService } from './marks/marks.service';
 import { LoginService } from './login/login.service';
+import { AuthModule } from './auth/auth.module';
+import { UsersModule } from './users/users.module';
 
 import knexConfig from './knex/knex.config';
 
 @Module({
-  imports: [KnexModule.register(knexConfig)],
+  imports: [KnexModule.register(knexConfig), AuthModule, UsersModule],
   controllers: [
     AppController,
     DisciplinesController,
