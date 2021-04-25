@@ -6,7 +6,7 @@ import { KnexService } from '../knex/knex.service';
 export class MarksService {
   constructor(private readonly knexService: KnexService) {}
 
-  async getMarks(disciplineId) {
+  async getMarks(disciplineId, groupId) {
     const knex = this.knexService.getKnex();
 
     const studentsDisciplines = await knex
@@ -58,5 +58,11 @@ export class MarksService {
     }
 
     return knex('marks').where('id', mark.id).update(mark);
+  }
+
+  async deleteMarks(jobIds: Array<string>) {
+    const knex = this.knexService.getKnex();
+
+    return knex('marks').whereIn('jobId', jobIds).update('deleted', true);
   }
 }

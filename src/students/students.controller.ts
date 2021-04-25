@@ -57,11 +57,10 @@ export class StudentsController {
   @Delete()
   async deleteStudents(@Query() query, @Res() res: Response) {
     try {
-      const ids = JSON.parse(query.ids);
+      const ids = Array.isArray(query.ids) ? query.ids : [query.ids];
 
-      const dbRes = await this.studentService.deleteStudents(ids);
+      await this.studentService.deleteStudents(ids);
 
-      console.log(dbRes);
       res.status(200).json({
         status: 'success',
       });

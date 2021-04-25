@@ -52,7 +52,7 @@ export class JobsController {
   @Delete()
   async deleteJobs(@Query() query, @Res() res: Response) {
     try {
-      const ids = JSON.parse(query.ids);
+      const ids = Array.isArray(query.ids) ? query.ids : [query.ids];
 
       await this.jobsService.deleteJobs(ids);
 

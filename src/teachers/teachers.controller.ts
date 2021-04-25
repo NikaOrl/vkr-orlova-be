@@ -26,10 +26,8 @@ export class TeachersController {
   @Post()
   async createTeacher(@Res() res: Response, @Body() teacher: CreateTeacherDto) {
     try {
-      console.log(teacher);
-      const dbRes = await this.teachersService.createTeachers(teacher);
+      await this.teachersService.createTeachers(teacher);
 
-      console.log(dbRes);
       res.status(200).json({
         status: 'success',
       });
@@ -63,11 +61,10 @@ export class TeachersController {
   @Delete()
   async deleteTeachers(@Query() query, @Res() res: Response) {
     try {
-      const ids = JSON.parse(query.ids);
+      const ids = Array.isArray(query.ids) ? query.ids : [query.ids];
 
-      const dbRes = await this.teachersService.deleteTeachers(ids);
+      await this.teachersService.deleteTeachers(ids);
 
-      console.log(dbRes);
       res.status(200).json({
         status: 'success',
       });

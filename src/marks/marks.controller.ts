@@ -1,4 +1,13 @@
-import { Body, Controller, Get, Param, Post, Put, Res } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Post,
+  Put,
+  Query,
+  Res,
+} from '@nestjs/common';
 import { Response } from 'express';
 
 import { MarksService } from './marks.service';
@@ -9,9 +18,9 @@ import { CreateMarkDto } from './create-mark.dto';
 export class MarksController {
   constructor(private marksService: MarksService) {}
 
-  @Get(':disciplineId')
-  async getMarks(@Param() params) {
-    return await this.marksService.getMarks(params.disciplineId);
+  @Get()
+  async getMarks(@Query() query) {
+    return await this.marksService.getMarks(query.disciplineId, query.groupId);
   }
 
   @Post()
@@ -36,6 +45,22 @@ export class MarksController {
       });
 
       await Promise.all(promises);
+
+      res.status(200).json({
+        status: 'success',
+      });
+    } catch (err) {
+      console.log(err);
+      throw err;
+    }
+  }
+
+  @Delete()
+  async deleteJobs(@Query() query, @Res() res: Response) {
+    try {
+      const ids = Array.isArray(query.ids) ? query.ids : [query.ids];
+
+      await this.marksService.deleteMarks(ids);
 
       res.status(200).json({
         status: 'success',
