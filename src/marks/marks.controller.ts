@@ -11,8 +11,8 @@ import {
 import { Response } from 'express';
 
 import { MarksService } from './marks.service';
-import { UpdateMarkDto } from './update-mark.dto';
-import { CreateMarkDto } from './create-mark.dto';
+import { UpdateMarkDto } from './dto/update-mark.dto';
+import { CreateMarkDto } from './dto/create-mark.dto';
 
 @Controller('marks')
 export class MarksController {
