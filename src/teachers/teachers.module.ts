@@ -1,13 +1,13 @@
 import { Module } from '@nestjs/common';
 
-import { UsersService } from './users.service';
+import { TeachersService } from './teachers.service';
 import { KnexModule } from '../knex/knex.module';
 
 import knexConfig from '../knex/knex.config';
 
 @Module({
   imports: [KnexModule.register(knexConfig)],
-  providers: [UsersService],
-  exports: [UsersService],
+  providers: [TeachersService],
+  exports: [TeachersService],
 })
-export class UsersModule {}
+export class TeachersModule {}

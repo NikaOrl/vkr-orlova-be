@@ -3,9 +3,17 @@ import { KnexService } from '../knex/knex.service';
 
 const bcrypt = require('bcryptjs');
 
+export type Teacher = any;
+
 @Injectable()
 export class TeachersService {
   constructor(private readonly knexService: KnexService) {}
+
+  async findOne(email: string): Promise<Teacher | undefined> {
+    const knex = this.knexService.getKnex();
+
+    return knex('teachers').where({ email }).first();
+  }
 
   async getAll() {
     const knex = this.knexService.getKnex();

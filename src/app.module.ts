@@ -18,13 +18,13 @@ import { JobsService } from './jobs/jobs.service';
 import { MarksService } from './marks/marks.service';
 import { LoginService } from './login/login.service';
 import { AuthModule } from './auth/auth.module';
-import { UsersModule } from './users/users.module';
+import { TeachersModule } from './teachers/teachers.module';
 
 import knexConfig from './knex/knex.config';
 import { LoggerMiddleware } from './logger';
 
 @Module({
-  imports: [KnexModule.register(knexConfig), AuthModule, UsersModule],
+  imports: [KnexModule.register(knexConfig), AuthModule, TeachersModule],
   controllers: [
     AppController,
     DisciplinesController,

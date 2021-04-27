@@ -3,17 +3,17 @@ import { JwtService } from '@nestjs/jwt';
 
 const bcrypt = require('bcryptjs');
 
-import { UsersService } from '../users/users.service';
+import { TeachersService } from '../teachers/teachers.service';
 
 @Injectable()
 export class AuthService {
   constructor(
-    private usersService: UsersService,
+    private teachersService: TeachersService,
     private jwtService: JwtService,
   ) {}
 
   async validateTeacher(email: string, pass: string): Promise<any> {
-    const teacher = await this.usersService.findOne(email);
+    const teacher = await this.teachersService.findOne(email);
 
     const isMatch = await bcrypt.compare(pass, teacher.password);
 
