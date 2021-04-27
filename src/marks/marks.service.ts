@@ -20,6 +20,7 @@ export class MarksService {
       .from('students')
       .select('*')
       .whereIn('id', studentsIds)
+      .andWhere('groupId', groupId)
       .andWhere('deleted', false);
 
     const jobs = await knex
