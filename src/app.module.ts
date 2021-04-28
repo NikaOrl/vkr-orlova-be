@@ -23,6 +23,7 @@ import { TeachersModule } from './teachers/teachers.module';
 import knexConfig from './knex/knex.config';
 import { LoggerMiddleware } from './logger';
 import { MarksModule } from './marks/marks.module';
+import { DisciplinesModule } from './disciplines/disciplines.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { MarksModule } from './marks/marks.module';
     AuthModule,
     TeachersModule,
     MarksModule,
+    DisciplinesModule,
   ],
   controllers: [
     AppController,

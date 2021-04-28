@@ -7,7 +7,7 @@ export class DisciplinesController {
   constructor(private disciplinesService: DisciplinesService) {}
 
   @Get()
-  async getDisciplines() {
-    return this.disciplinesService.getDisciplines();
+  async getDisciplinesWithTeachers() {
+    return this.disciplinesService.getDisciplinesWithTeachers();
   }
 }

@@ -19,8 +19,8 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
-    "tables:create": "cd tables && node create_disciplines_table.js && node create_groups_table.js && node create_jobs_table.js && node create_marks_table.js && node create_students_disciplines_table.js && node create_students_table.js && node create_teachers_table.js",
-    "tables:insert": "cd tables && node insert_disciplines.js && node insert_groups.js && node insert_jobs.js && node insert_marks.js && node insert_students_disciplines.js && node insert_students.js && node insert_teachers.js",
+    "tables:create": "cd tables && node create_tabels.js",
+    "tables:insert": "cd tables && node insert_data.js",
     "docker:db": "cd ./db && docker-compose up",
     "docker:db:down": "cd ./db && docker-compose down -v"
   },
@@ -37,6 +37,7 @@
     "passport": "^0.4.1",
     "passport-jwt": "^4.0.0",
     "passport-local": "^1.0.0",
+    "ramda": "^0.27.1",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
     "rxjs": "^6.6.6"
@@ -50,6 +51,7 @@
     "@types/node": "^14.14.31",
     "@types/passport-jwt": "^3.0.5",
     "@types/passport-local": "^1.0.33",
+    "@types/ramda": "github:types/npm-ramda#dist",
     "@types/supertest": "^2.0.10",
     "@typescript-eslint/eslint-plugin": "^4.15.2",
     "@typescript-eslint/parser": "^4.15.2",
