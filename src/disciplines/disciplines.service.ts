@@ -58,4 +58,50 @@ export class DisciplinesService {
       ];
     }, []);
   }
+
+  async getStudentsWithDiscipline(disciplineId) {
+    const knex = this.knexService.getKnex();
+
+    const groups = await knex.from('groups').select('*');
+
+    const students = await knex
+      .from('students')
+      .select(['id', 'firstName', 'lastName', 'groupId']);
+
+    const studentWithDiscipline = await knex
+      .from('students-disciplines')
+      .select('studentId')
+      .where('disciplineId', disciplineId);
+
+    const studentIdsWithDiscipline = R.map(
+      R.prop('studentId'),
+      studentWithDiscipline,
+    );
+
+    const getGroupNumber = (groupId) =>
+      R.pipe(R.find(R.propEq('id', groupId)), R.prop('groupNumber'))(groups);
+
+    const isStudentInDiscipline = R.contains(R.__, studentIdsWithDiscipline);
+
+    const groupsWithStudents = R.pipe(
+      R.groupBy(R.prop('groupId')),
+      R.toPairs,
+      R.map(([stringGroupId, students]) => ({
+        groupId: Number(stringGroupId),
+        students,
+      })),
+    )(students);
+
+    return R.map(({ groupId, students }) => {
+      return {
+        groupId,
+        groupNumber: getGroupNumber(groupId),
+        students: students.map(({ id, ...studentData }) => ({
+          id,
+          ...studentData,
+          isInDiscipline: isStudentInDiscipline(id),
+        })),
+      };
+    })(groupsWithStudents);
+  }
 }

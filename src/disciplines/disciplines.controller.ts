@@ -1,4 +1,4 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Param } from '@nestjs/common';
 
 import { DisciplinesService } from './disciplines.service';
 
@@ -9,5 +9,12 @@ export class DisciplinesController {
   @Get()
   async getDisciplinesWithTeachers() {
     return this.disciplinesService.getDisciplinesWithTeachers();
+  }
+
+  @Get(':disciplineId/students')
+  async getStudentsWithDiscipline(@Param() params) {
+    return this.disciplinesService.getStudentsWithDiscipline(
+      params.disciplineId,
+    );
   }
 }
