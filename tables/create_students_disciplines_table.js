@@ -3,7 +3,7 @@ const knex = require('knex')(options);
 
 knex.schema
   .createTable('students-disciplines', (table) => {
-    table.uuid('id');
+    table.uuid('id').primary();
     table.uuid('studentId');
     table.uuid('disciplineId');
   })

@@ -3,7 +3,7 @@ const knex = require('knex')(options);
 
 knex.schema
   .createTable('jobs', (table) => {
-    table.uuid('id');
+    table.uuid('id').primary();
     table.uuid('disciplineId');
     table.string('jobValue');
     table.integer('maxPoint').defaultTo(0);
