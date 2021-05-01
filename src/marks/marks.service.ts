@@ -1,3 +1,4 @@
+import * as R from 'ramda';
 import { v4 as uuid } from 'uuid';
 import { Injectable } from '@nestjs/common';
 
@@ -32,6 +33,14 @@ export class MarksService {
 
     const jodsIds = jobs.map((job) => job.id);
 
+    const moduleIds = R.pipe(R.map(R.prop('moduleId')), R.uniq)(jobs);
+
+    const modules = await knex
+      .from('modules')
+      .select(['id', 'moduleName', 'numberInList'])
+      .whereIn('id', moduleIds)
+      .andWhere('deleted', false);
+
     const marks = await knex
       .from('marks')
       .select('*')
@@ -41,6 +50,7 @@ export class MarksService {
 
     return {
       students,
+      modules,
       jobs,
       marks,
     };
