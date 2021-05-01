@@ -1,13 +1,56 @@
-import { Controller, Get } from '@nestjs/common';
+import { Body, Controller, Get, Param, Put, Res } from '@nestjs/common';
 
 import { DisciplinesService } from './disciplines.service';
+import { Response } from 'express';
 
 @Controller('disciplines')
 export class DisciplinesController {
   constructor(private disciplinesService: DisciplinesService) {}
 
   @Get()
-  async getDisciplines() {
-    return this.disciplinesService.getDisciplines();
+  async getDisciplinesWithTeachers() {
+    return this.disciplinesService.getDisciplinesWithTeachers();
+  }
+
+  @Put(':disciplineId')
+  async updateDiscipline(@Res() res: Response, @Param() params, @Body() body) {
+    try {
+      await this.disciplinesService.updateDiscipline(params.disciplineId, body);
+
+      res.status(200).json({
+        status: 'success',
+      });
+    } catch (err) {
+      console.log(err);
+      throw err;
+    }
+  }
+
+  @Get(':disciplineId/students')
+  async getStudentsWithDiscipline(@Param() params) {
+    return this.disciplinesService.getStudentsWithDiscipline(
+      params.disciplineId,
+    );
+  }
+
+  @Put(':disciplineId/students')
+  async updateStudentsWithDiscipline(
+    @Param() params,
+    @Body() body,
+    @Res() res: Response,
+  ) {
+    try {
+      await this.disciplinesService.updateStudentsWithDiscipline(
+        params.disciplineId,
+        body,
+      );
+
+      res.status(200).json({
+        status: 'success',
+      });
+    } catch (err) {
+      console.log(err);
+      throw err;
+    }
   }
 }
