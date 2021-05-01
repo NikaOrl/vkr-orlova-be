@@ -12,6 +12,20 @@ export class DisciplinesController {
     return this.disciplinesService.getDisciplinesWithTeachers();
   }
 
+  @Put(':disciplineId')
+  async updateDiscipline(@Res() res: Response, @Param() params, @Body() body) {
+    try {
+      await this.disciplinesService.updateDiscipline(params.disciplineId, body);
+
+      res.status(200).json({
+        status: 'success',
+      });
+    } catch (err) {
+      console.log(err);
+      throw err;
+    }
+  }
+
   @Get(':disciplineId/students')
   async getStudentsWithDiscipline(@Param() params) {
     return this.disciplinesService.getStudentsWithDiscipline(

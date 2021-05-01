@@ -59,6 +59,45 @@ export class DisciplinesService {
     }, []);
   }
 
+  async updateDiscipline(id, data) {
+    const knex = this.knexService.getKnex();
+
+    const currentTeachers = await knex
+      .from('disciplines-teachers')
+      .select('teacherId')
+      .where('disciplineId', id);
+
+    const updatedTeacherIds = data.teacherIds.map(Number);
+    const currentTeacherIds = currentTeachers.map(R.prop('teacherId'));
+
+    const teacherIdsToAddToDiscipline = R.difference(
+      updatedTeacherIds,
+      currentTeacherIds,
+    );
+
+    const teacherIdsToRemoveFromDiscipline = R.difference(
+      currentTeacherIds,
+      updatedTeacherIds,
+    );
+
+    const teachersWithDisciplineIdToAdd = teacherIdsToAddToDiscipline.map(
+      (teacherId) => ({
+        teacherId,
+        disciplineId: id,
+      }),
+    );
+
+    if (!R.isEmpty(teacherIdsToAddToDiscipline)) {
+      await knex('disciplines-teachers').insert(teachersWithDisciplineIdToAdd);
+    }
+
+    if (!R.isEmpty(teacherIdsToRemoveFromDiscipline)) {
+      await knex('disciplines-teachers')
+        .whereIn('teacherId', teacherIdsToRemoveFromDiscipline)
+        .delete();
+    }
+  }
+
   async getStudentsWithDiscipline(disciplineId) {
     const knex = this.knexService.getKnex();
 
@@ -159,7 +198,6 @@ export class DisciplinesService {
         studentId: studentId,
         disciplineId: Number(disciplineId),
       })),
-      R.filter(R.complement(R.isNil)),
     )(studentIdsToAddToDiscipline);
 
     if (!R.isEmpty(studentsWithDisciplineIdToAdd)) {
