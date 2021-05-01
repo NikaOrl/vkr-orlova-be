@@ -78,8 +78,12 @@ export class DisciplinesService {
       studentWithDiscipline,
     );
 
-    const getGroupNumber = (groupId) =>
-      R.pipe(R.find(R.propEq('id', groupId)), R.prop('groupNumber'))(groups);
+    const getGroupNumber = (groupId) => {
+      return R.pipe(
+        R.find(R.propEq('id', groupId)),
+        R.prop('groupNumber'),
+      )(groups);
+    };
 
     const isStudentInDiscipline = R.contains(R.__, studentIdsWithDiscipline);
 
@@ -103,5 +107,69 @@ export class DisciplinesService {
         })),
       };
     })(groupsWithStudents);
+  }
+
+  async updateStudentsWithDiscipline(disciplineId, groupsWithStudents) {
+    const knex = this.knexService.getKnex();
+
+    const currentStudentsWithDiscipline = await knex
+      .from('students-disciplines')
+      .select('*')
+      .where('disciplineId', disciplineId);
+
+    const currentStudentsWithDisciplineIds = R.map(R.prop('studentId'))(
+      currentStudentsWithDiscipline,
+    );
+
+    const students = groupsWithStudents.reduce((acc, group) => {
+      return [...acc, ...group.students];
+    }, []);
+
+    const updatedStudentsWithDisciplineIds = students.reduce((acc, student) => {
+      if (student.isInDiscipline) {
+        return [...acc, student.id];
+      }
+
+      return acc;
+    }, []);
+
+    const updatedStudentsWithoutDisciplineIds = students.reduce(
+      (acc, student) => {
+        if (!student.isInDiscipline) {
+          return [...acc, student.id];
+        }
+
+        return acc;
+      },
+      [],
+    );
+
+    const studentIdsToAddToDiscipline = R.difference(
+      updatedStudentsWithDisciplineIds,
+      currentStudentsWithDisciplineIds,
+    );
+
+    const studentIdsToRemoveFromDiscipline = R.intersection(
+      updatedStudentsWithoutDisciplineIds,
+      currentStudentsWithDisciplineIds,
+    );
+
+    const studentsWithDisciplineIdToAdd = R.pipe(
+      R.map((studentId) => ({
+        studentId: studentId,
+        disciplineId: Number(disciplineId),
+      })),
+      R.filter(R.complement(R.isNil)),
+    )(studentIdsToAddToDiscipline);
+
+    if (!R.isEmpty(studentsWithDisciplineIdToAdd)) {
+      await knex('students-disciplines').insert(studentsWithDisciplineIdToAdd);
+    }
+
+    if (!R.isEmpty(studentIdsToRemoveFromDiscipline)) {
+      await knex('students-disciplines')
+        .whereIn('studentId', studentIdsToRemoveFromDiscipline)
+        .delete();
+    }
   }
 }
