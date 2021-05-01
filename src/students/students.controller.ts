@@ -13,8 +13,8 @@ import { Response } from 'express';
 
 import { StudentsService } from './students.service';
 
-import { CreateStudentDto } from './create-student.dto';
-import { UpdateStudentsDto } from './update-students.dto';
+import { CreateStudentDto } from './dto/create-student.dto';
+import { UpdateStudentsDto } from './dto/update-students.dto';
 
 @Controller('students')
 export class StudentsController {
@@ -26,8 +26,20 @@ export class StudentsController {
   }
 
   @Post()
-  async addStudent(@Body() studentData: CreateStudentDto) {
-    return await this.studentService.addStudent(studentData);
+  async addStudent(
+    @Body() studentData: CreateStudentDto,
+    @Res() res: Response,
+  ) {
+    try {
+      await this.studentService.addStudent(studentData);
+
+      res.status(200).json({
+        status: 'success',
+      });
+    } catch (err) {
+      console.log(err);
+      throw err;
+    }
   }
 
   @Put()

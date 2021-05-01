@@ -1,9 +1,8 @@
-export interface UpdateStudentsDto {
-  id: number;
+export interface CreateStudentDto {
   firstName: string;
   lastName: string;
   numberInList: number;
   email: string;
-  groupId: number;
+  groupId: string;
   headStudent: boolean;
 }

@@ -1,3 +1,4 @@
+import { v4 as uuid } from 'uuid';
 import { Injectable } from '@nestjs/common';
 
 import { KnexService } from '../knex/knex.service';
@@ -19,7 +20,10 @@ export class StudentsService {
   async addStudent(studentData) {
     const knex = this.knexService.getKnex();
 
-    await knex('students').insert(studentData);
+    await knex('students').insert({
+      id: uuid(),
+      ...studentData,
+    });
   }
 
   async updateStudent(id, data) {
