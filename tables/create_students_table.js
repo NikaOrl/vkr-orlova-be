@@ -3,12 +3,12 @@ const knex = require('knex')(options);
 
 knex.schema
   .createTable('students', (table) => {
-    table.increments('id');
+    table.uuid('id').primary();
     table.string('firstName');
     table.string('lastName');
     table.integer('numberInList');
     table.string('email');
-    table.integer('groupId');
+    table.uuid('groupId');
     table.boolean('headStudent').defaultTo(false);
     table.boolean('deleted').defaultTo(false);
   })

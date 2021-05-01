@@ -1,3 +1,4 @@
+import { v4 as uuid } from 'uuid';
 import { Injectable } from '@nestjs/common';
 
 import { KnexService } from '../knex/knex.service';
@@ -48,7 +49,10 @@ export class MarksService {
   async createMark(mark) {
     const knex = this.knexService.getKnex();
 
-    return knex('marks').insert(mark);
+    return knex('marks').insert({
+      id: uuid(),
+      ...mark,
+    });
   }
 
   async updateMark(mark) {

@@ -11,8 +11,8 @@ import {
 import { Response } from 'express';
 
 import { TeachersService } from './teachers.service';
-import { PutTeachersDto } from './put-teachers.dto';
-import { CreateTeacherDto } from './create-teacher.dto';
+import { PutTeachersDto } from './dto/put-teachers.dto';
+import { CreateTeacherDto } from './dto/create-teacher.dto';
 
 @Controller('teachers')
 export class TeachersController {

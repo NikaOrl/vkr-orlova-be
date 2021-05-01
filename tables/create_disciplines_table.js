@@ -3,9 +3,9 @@ const knex = require('knex')(options);
 
 knex.schema
   .createTable('disciplines', (table) => {
-    table.increments('id');
+    table.uuid('id').primary();
     table.string('disciplineValue');
-    table.integer('semesterId');
+    table.uuid('semesterId');
   })
   .then(() => console.log('table disciplines created'))
   .catch((err) => {

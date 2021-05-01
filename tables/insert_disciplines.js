@@ -3,19 +3,19 @@ const knex = require('knex')(options);
 
 const disciplines = [
   {
-    id: 1,
+    id: '1',
     disciplineValue: 'oop',
-    semesterId: 1,
+    semesterId: '1',
   },
   {
-    id: 2,
+    id: '2',
     disciplineValue: 'web',
-    semesterId: 1,
+    semesterId: '1',
   },
   {
-    id: 3,
+    id: '3',
     disciplineValue: 'comp.gr.',
-    semesterId: 1,
+    semesterId: '1',
   },
 ];
 

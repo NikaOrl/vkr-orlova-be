@@ -3,9 +3,9 @@ const knex = require('knex')(options);
 
 knex.schema
   .createTable('marks', (table) => {
-    table.increments('id');
-    table.integer('studentId');
-    table.integer('jobId');
+    table.uuid('id').primary();
+    table.uuid('studentId');
+    table.uuid('jobId');
     table.string('markValue');
     table.boolean('deleted').defaultTo(false);
   })

@@ -1,4 +1,5 @@
 import * as R from 'ramda';
+import { v4 as uuid } from 'uuid';
 import { Injectable } from '@nestjs/common';
 
 import { KnexService } from '../knex/knex.service';
@@ -10,16 +11,16 @@ export class DisciplinesService {
   async getDisciplinesWithTeachers() {
     const knex = this.knexService.getKnex();
 
-    const disciplines = await knex
+    const disciplinesTeachers = await knex
       .from('disciplines')
       .leftJoin(
         'disciplines-teachers',
         'disciplines.id',
         'disciplines-teachers.disciplineId',
       )
-      .select('*');
+      .select(['disciplineValue', 'semesterId', 'disciplineId', 'teacherId']);
 
-    const teacherIds = R.map(R.prop('teacherId'), disciplines);
+    const teacherIds = R.map(R.prop('teacherId'), disciplinesTeachers);
 
     const teachers = await knex
       .from('teachers')
@@ -28,35 +29,38 @@ export class DisciplinesService {
 
     const getTeacher = (teacherId) => teachers.find(R.propEq('id', teacherId));
 
-    return disciplines.reduce((acc, { disciplineId, teacherId, ...data }) => {
-      const discipline = acc.find(R.propEq('id', disciplineId));
+    return disciplinesTeachers.reduce(
+      (acc, { disciplineId, teacherId, ...data }) => {
+        const discipline = R.find(R.propEq('id', disciplineId))(acc);
 
-      const accWithoutCurrent = acc.filter(
-        R.complement(R.propEq('id', disciplineId)),
-      );
+        const accWithoutCurrent = acc.filter(
+          R.complement(R.propEq('id', disciplineId)),
+        );
 
-      const pushTeacherToDiscipline = R.evolve({
-        teachers: R.append(getTeacher(teacherId)),
-      });
+        const pushTeacherToDiscipline = R.evolve({
+          teachers: R.append(getTeacher(teacherId)),
+        });
 
-      if (!discipline) {
+        if (!discipline) {
+          return [
+            ...acc,
+            {
+              id: disciplineId,
+              teachers: [getTeacher(teacherId)],
+              ...data,
+            },
+          ];
+        }
+
         return [
-          ...acc,
+          ...accWithoutCurrent,
           {
-            id: disciplineId,
-            teachers: [getTeacher(teacherId)],
-            ...data,
+            ...pushTeacherToDiscipline(discipline),
           },
         ];
-      }
-
-      return [
-        ...accWithoutCurrent,
-        {
-          ...pushTeacherToDiscipline(discipline),
-        },
-      ];
-    }, []);
+      },
+      [],
+    );
   }
 
   async updateDiscipline(id, data) {
@@ -67,7 +71,7 @@ export class DisciplinesService {
       .select('teacherId')
       .where('disciplineId', id);
 
-    const updatedTeacherIds = data.teacherIds.map(Number);
+    const updatedTeacherIds = data.teacherIds;
     const currentTeacherIds = currentTeachers.map(R.prop('teacherId'));
 
     const teacherIdsToAddToDiscipline = R.difference(
@@ -82,6 +86,7 @@ export class DisciplinesService {
 
     const teachersWithDisciplineIdToAdd = teacherIdsToAddToDiscipline.map(
       (teacherId) => ({
+        id: uuid(),
         teacherId,
         disciplineId: id,
       }),
@@ -93,6 +98,7 @@ export class DisciplinesService {
 
     if (!R.isEmpty(teacherIdsToRemoveFromDiscipline)) {
       await knex('disciplines-teachers')
+        .where('disciplineId', id)
         .whereIn('teacherId', teacherIdsToRemoveFromDiscipline)
         .delete();
     }
@@ -129,8 +135,8 @@ export class DisciplinesService {
     const groupsWithStudents = R.pipe(
       R.groupBy(R.prop('groupId')),
       R.toPairs,
-      R.map(([stringGroupId, students]) => ({
-        groupId: Number(stringGroupId),
+      R.map(([groupId, students]) => ({
+        groupId,
         students,
       })),
     )(students);
@@ -195,8 +201,9 @@ export class DisciplinesService {
 
     const studentsWithDisciplineIdToAdd = R.pipe(
       R.map((studentId) => ({
-        studentId: studentId,
-        disciplineId: Number(disciplineId),
+        id: uuid(),
+        studentId,
+        disciplineId,
       })),
     )(studentIdsToAddToDiscipline);
 
@@ -206,6 +213,7 @@ export class DisciplinesService {
 
     if (!R.isEmpty(studentIdsToRemoveFromDiscipline)) {
       await knex('students-disciplines')
+        .where('disciplineId', disciplineId)
         .whereIn('studentId', studentIdsToRemoveFromDiscipline)
         .delete();
     }

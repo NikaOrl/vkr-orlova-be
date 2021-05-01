@@ -9,7 +9,7 @@ const DEFAULT_PASSWORD = '123';
 
 const teachers = [
   {
-    id: 1,
+    id: '1',
     firstName: 'Ivan',
     lastName: 'Ivanov',
     email: 'ivan@teacher.com',
@@ -17,7 +17,7 @@ const teachers = [
     isAdmin: true,
   },
   {
-    id: 2,
+    id: '2',
     firstName: 'Petr',
     lastName: 'Petrov',
     email: 'petr@teacher.com',
@@ -25,7 +25,7 @@ const teachers = [
     isAdmin: false,
   },
   {
-    id: 3,
+    id: '3',
     firstName: 'Vasia',
     lastName: 'Vasiliev',
     email: 'vasia@teacher.com',
@@ -33,7 +33,7 @@ const teachers = [
     isAdmin: false,
   },
   {
-    id: 4,
+    id: '4',
     firstName: 'Sergei',
     lastName: 'Sergeev',
     email: 'serg@teacher.com',
