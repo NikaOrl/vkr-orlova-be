@@ -6,7 +6,7 @@ knex.schema
     table.uuid('id');
     table.uuid('disciplineId');
     table.string('jobValue');
-    table.integer('maxPoint');
+    table.integer('maxPoint').defaultTo(0);
     table.boolean('deleted').defaultTo(false);
   })
   .then(() => console.log('table jobs created'))
