@@ -3,8 +3,8 @@ const knex = require('knex')(options);
 
 knex.schema
   .createTable('jobs', (table) => {
-    table.increments('id');
-    table.integer('disciplineId');
+    table.uuid('id');
+    table.uuid('disciplineId');
     table.string('jobValue');
     table.integer('maxPoint');
     table.boolean('deleted').defaultTo(false);
