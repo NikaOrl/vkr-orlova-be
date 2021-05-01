@@ -45,6 +45,12 @@ $ npm run start:dev
 $ npm run start:prod
 ```
 
+## Running DB
+
+1. Set your local DB according to `env/db.config`
+2. Run `npm tables:create` to create all the necessary tables
+3. Run `npm tables:insert` to insert tables with start data
+
 ## Test
 
 ```bash
@@ -57,6 +63,41 @@ $ npm run test:e2e
 # test coverage
 $ npm run test:cov
 ```
+
+## Register
+
+To login you have to be registred
+
+1. Using Postman or any other tools send a following request
+
+   POST `http://localhost:3000/register`
+
+   HTTP Headers:
+
+```
+{
+  "Content-Type": "application/json"
+}
+```
+
+Body:
+
+```
+{
+	"firstName": "admin",
+	"lastName": "admin",
+	"email": "admin@gmail.com",
+	"password": "admin",
+	"isAdmin": 1
+}
+```
+
+Now you can login with:
+
+email: "admin@gmail.com";
+
+password: "admin".
+
 
 ## Support
 
