@@ -1,7 +1,7 @@
 export interface PutTeachersDto {
   firstName: string;
   lastName: string;
-  id: number;
+  id: string;
   email: string;
   isAdmin: boolean;
   password: string;

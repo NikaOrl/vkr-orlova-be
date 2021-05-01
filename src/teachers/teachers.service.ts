@@ -1,3 +1,4 @@
+import { v4 as uuid } from 'uuid';
 import { Injectable } from '@nestjs/common';
 import { KnexService } from '../knex/knex.service';
 
@@ -62,6 +63,7 @@ export class TeachersService {
     const passwordHash = bcrypt.hashSync(teacherData.password, salt);
 
     return knex('teachers').insert({
+      id: uuid(),
       email: teacherData.email,
       password: passwordHash,
       firstName: teacherData.firstName,
