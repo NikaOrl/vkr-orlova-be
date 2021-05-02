@@ -143,7 +143,7 @@ export class DisciplinesService {
 
     return R.map(({ groupId, students }) => {
       return {
-        groupId,
+        id: groupId,
         groupNumber: getGroupNumber(groupId),
         students: students.map(({ id, ...studentData }) => ({
           id,
