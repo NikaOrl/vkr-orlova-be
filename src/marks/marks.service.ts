@@ -8,30 +8,41 @@ import { KnexService } from '../knex/knex.service';
 export class MarksService {
   constructor(private readonly knexService: KnexService) {}
 
-  async getMarks(disciplineId, groupId) {
+  async getMarks(disciplineId: string, groupId: string): Promise<any> {
     const knex = this.knexService.getKnex();
 
-    const studentsDisciplines = await knex
-      .from('students-disciplines')
-      .select('studentId')
-      .where('disciplineId', disciplineId);
-
-    const studentsIds = studentsDisciplines.map((st) => st.studentId);
-
     const students = await knex
-      .from('students')
-      .select('*')
-      .whereIn('id', studentsIds)
+      .from('students-disciplines')
+      .where('disciplineId', disciplineId)
+      .leftJoin('students', 'students-disciplines.studentId', 'students.id')
+      .select([
+        'studentId as id',
+        'disciplineId',
+        'firstName',
+        'lastName',
+        'email',
+        'groupId',
+        'headStudent',
+      ])
       .andWhere('groupId', groupId)
       .andWhere('deleted', false);
 
+    const studentIds = students.map(R.prop('id'));
+
     const jobs = await knex
       .from('jobs')
-      .select('*')
+      .select([
+        'id',
+        'disciplineId',
+        'moduleId',
+        'numberInList',
+        'jobValue',
+        'maxPoint',
+      ])
       .where('disciplineId', disciplineId)
       .andWhere('deleted', false);
 
-    const jodsIds = jobs.map((job) => job.id);
+    const jobIds = jobs.map(R.prop('id'));
 
     const moduleIds = R.pipe(R.map(R.prop('moduleId')), R.uniq)(jobs);
 
@@ -43,16 +54,24 @@ export class MarksService {
 
     const marks = await knex
       .from('marks')
-      .select('*')
-      .whereIn('jobId', jodsIds)
-      .whereIn('studentId', studentsIds)
+      .select(['id', 'studentId', 'jobId', 'markValue', 'deleted'])
+      .whereIn('jobId', jobIds)
+      .whereIn('studentId', studentIds)
       .andWhere('deleted', false);
+
+    const resultJobs = jobs.map((job) => {
+      const jobMarks = R.filter(R.propEq('jobId', job.id))(marks);
+
+      return {
+        ...job,
+        marks: jobMarks,
+      };
+    });
 
     return {
       students,
       modules,
-      jobs,
-      marks,
+      jobs: resultJobs,
     };
   }
 
