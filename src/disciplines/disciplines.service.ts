@@ -83,6 +83,10 @@ export class DisciplinesService {
       }),
     );
 
+    await knex('disciplines').where('id', id).update({
+      disciplineValue: data.disciplineValue,
+    });
+
     if (!R.isEmpty(teacherIdsToAddToDiscipline)) {
       await knex('disciplines-teachers').insert(teachersWithDisciplineIdToAdd);
     }
