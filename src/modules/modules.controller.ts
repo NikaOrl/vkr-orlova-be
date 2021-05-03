@@ -8,15 +8,16 @@ export class ModulesController {
   @Get('/jobs')
   async getModulesWithJobs(
     @Query('disciplineId') disciplineId: string,
+    @Query('groupId') groupId: string,
   ): Promise<any> {
-    return this.modulesService.getModulesWithJobs(disciplineId);
+    return this.modulesService.getModulesWithJobs(disciplineId, groupId);
   }
 
   @Put('/jobs')
   async updateModulesWithJobs(
     @Query('disciplineId') disciplineId: string,
-    // @Body() body,
+    @Query('groupId') groupId: string,
   ): Promise<any> {
-    return this.modulesService.getModulesWithJobs(disciplineId);
+    return this.modulesService.getModulesWithJobs(disciplineId, groupId);
   }
 }

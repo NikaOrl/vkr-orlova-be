@@ -3,6 +3,7 @@ import { v4 as uuid } from 'uuid';
 import { Injectable } from '@nestjs/common';
 
 import { KnexService } from '../knex/knex.service';
+import { MarkDB } from './marks.interface';
 
 @Injectable()
 export class MarksService {
@@ -27,9 +28,9 @@ export class MarksService {
       .andWhere('groupId', groupId)
       .andWhere('deleted', false);
 
-    const studentIds = students.map(R.prop('id'));
+    const studentIds = R.map(R.prop('id'))(students);
 
-    const marks = await knex('marks')
+    const marks = await knex<MarkDB>('marks')
       .select(['id', 'studentId', 'jobId', 'markValue', 'deleted'])
       .whereIn('studentId', studentIds)
       .andWhere('deleted', false);
