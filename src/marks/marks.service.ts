@@ -29,16 +29,14 @@ export class MarksService {
 
     const studentIds = students.map(R.prop('id'));
 
-    const marks = await knex
-      .from('marks')
+    const marks = await knex('marks')
       .select(['id', 'studentId', 'jobId', 'markValue', 'deleted'])
       .whereIn('studentId', studentIds)
       .andWhere('deleted', false);
 
     const jobIds = R.pipe(R.map(R.prop('jobId')), R.uniq)(marks);
 
-    const jobs = await knex
-      .from('jobs')
+    const jobs = await knex('jobs')
       .select([
         'id',
         'disciplineId',

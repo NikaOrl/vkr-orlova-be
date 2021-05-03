@@ -2,26 +2,27 @@ import { v4 as uuid } from 'uuid';
 import { Injectable } from '@nestjs/common';
 import { KnexService } from '../knex/knex.service';
 
-const bcrypt = require('bcryptjs');
+import { ForcefullyOmit } from '../../common/types/forcefully-omit';
+import { Teacher, TeacherDB } from './teachers.interface';
 
-export type Teacher = any;
+const bcrypt = require('bcryptjs');
 
 @Injectable()
 export class TeachersService {
   constructor(private readonly knexService: KnexService) {}
 
-  async findOne(email: string): Promise<Teacher | undefined> {
+  async findOne(email: string): Promise<Teacher> {
     const knex = this.knexService.getKnex();
 
-    return knex('teachers').where({ email }).first();
+    return knex<Teacher>('teachers').where({ email }).first();
   }
 
-  async getAll() {
+  async getAll(): Promise<ForcefullyOmit<Teacher, 'password'>[]> {
     const knex = this.knexService.getKnex();
 
     return knex
-      .from('teachers')
-      .select(['firstName', 'lastName', 'id', 'email', 'isAdmin', 'deleted'])
+      .from<TeacherDB>('teachers')
+      .select(['firstName', 'lastName', 'id', 'email', 'isAdmin'])
       .andWhere('deleted', false);
   }
 
