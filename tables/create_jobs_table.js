@@ -5,6 +5,8 @@ knex.schema
   .createTable('jobs', (table) => {
     table.uuid('id').primary();
     table.uuid('disciplineId');
+    table.uuid('moduleId');
+    table.integer('numberInList');
     table.string('jobValue');
     table.integer('maxPoint').defaultTo(0);
     table.boolean('deleted').defaultTo(false);

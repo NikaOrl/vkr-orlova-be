@@ -19,7 +19,7 @@ export class MarksController {
   constructor(private marksService: MarksService) {}
 
   @Get()
-  async getMarks(@Query() query) {
+  async getMarks(@Query() query): Promise<any> {
     return await this.marksService.getMarks(query.disciplineId, query.groupId);
   }
 

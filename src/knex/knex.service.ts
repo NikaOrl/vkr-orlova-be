@@ -1,5 +1,5 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
-import { knex } from 'knex';
+import { Knex, knex } from 'knex';
 
 import { KnexOptions } from './knex-options.interface';
 // import { CONFIG_OPTIONS } from './constants';
@@ -17,7 +17,7 @@ export class KnexService implements IKnexService {
     this.logger.log(`Options: ${JSON.stringify(this._KnexOptions)}`);
   }
 
-  getKnex() {
+  getKnex(): Knex {
     if (!this._knexConnection) {
       this._knexConnection = knex(this._KnexOptions);
     }
