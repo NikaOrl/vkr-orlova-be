@@ -20,15 +20,6 @@ export class DisciplinesService {
       )
       .select(['disciplineValue', 'semesterId', 'disciplineId', 'teacherId']);
 
-    const teacherIds = R.map(R.prop('teacherId'), disciplinesTeachers);
-
-    const teachers = await knex
-      .from('teachers')
-      .select(['firstName', 'lastName', 'id'])
-      .whereIn('id', teacherIds);
-
-    const getTeacher = (teacherId) => teachers.find(R.propEq('id', teacherId));
-
     return disciplinesTeachers.reduce(
       (acc, { disciplineId, teacherId, ...data }) => {
         const discipline = R.find(R.propEq('id', disciplineId))(acc);
@@ -38,7 +29,7 @@ export class DisciplinesService {
         );
 
         const pushTeacherToDiscipline = R.evolve({
-          teachers: R.append(getTeacher(teacherId)),
+          teacherIds: R.append(teacherId),
         });
 
         if (!discipline) {
@@ -46,7 +37,7 @@ export class DisciplinesService {
             ...acc,
             {
               id: disciplineId,
-              teachers: [getTeacher(teacherId)],
+              teacherIds: [teacherId],
               ...data,
             },
           ];

@@ -4,7 +4,7 @@ const knex = require('knex')(options);
 knex.schema
   .createTable('groups', (table) => {
     table.uuid('id').primary();
-    table.integer('groupNumber');
+    table.string('groupNumber');
   })
   .then(() => console.log('table groups created'))
   .catch((err) => {
