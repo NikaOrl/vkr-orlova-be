@@ -29,6 +29,14 @@ export class MarksService {
 
     const studentIds = students.map(R.prop('id'));
 
+    const marks = await knex
+      .from('marks')
+      .select(['id', 'studentId', 'jobId', 'markValue', 'deleted'])
+      .whereIn('studentId', studentIds)
+      .andWhere('deleted', false);
+
+    const jobIds = R.pipe(R.map(R.prop('jobId')), R.uniq)(marks);
+
     const jobs = await knex
       .from('jobs')
       .select([
@@ -40,9 +48,8 @@ export class MarksService {
         'maxPoint',
       ])
       .where('disciplineId', disciplineId)
+      .whereIn('id', jobIds)
       .andWhere('deleted', false);
-
-    const jobIds = jobs.map(R.prop('id'));
 
     const moduleIds = R.pipe(R.map(R.prop('moduleId')), R.uniq)(jobs);
 
@@ -50,13 +57,6 @@ export class MarksService {
       .from('modules')
       .select(['id', 'moduleName', 'numberInList'])
       .whereIn('id', moduleIds)
-      .andWhere('deleted', false);
-
-    const marks = await knex
-      .from('marks')
-      .select(['id', 'studentId', 'jobId', 'markValue', 'deleted'])
-      .whereIn('jobId', jobIds)
-      .whereIn('studentId', studentIds)
       .andWhere('deleted', false);
 
     const resultJobs = jobs.map((job) => {
