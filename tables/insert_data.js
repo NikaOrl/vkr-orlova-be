@@ -1,3 +1,5 @@
+require('./insert_attendances');
+require('./insert_attendance_marks');
 require('./insert_disciplines_teachers');
 require('./insert_disciplines');
 require('./insert_groups');
