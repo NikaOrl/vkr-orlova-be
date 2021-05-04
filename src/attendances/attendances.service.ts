@@ -63,8 +63,8 @@ export class AttendancesService {
     };
   }
 
-  // async updateAttendances(disciplineId: string, groupId: string, body: any) {
-  //
-  //   return
-  // }
+  async updateAttendances(disciplineId: string, groupId: string, body: any) {
+
+    return
+  }
 }
