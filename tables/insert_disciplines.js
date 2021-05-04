@@ -4,17 +4,17 @@ const knex = require('knex')(options);
 const disciplines = [
   {
     id: '1',
-    disciplineValue: 'oop',
+    disciplineValue: 'ООП',
     semesterId: '1',
   },
   {
     id: '2',
-    disciplineValue: 'web',
+    disciplineValue: 'Веб-технологии',
     semesterId: '1',
   },
   {
     id: '3',
-    disciplineValue: 'comp.gr.',
+    disciplineValue: 'Компьютерная Графика',
     semesterId: '1',
   },
 ];
