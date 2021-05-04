@@ -11,19 +11,19 @@ const attendances = [
   {
     id: '2',
     disciplineId: '1',
-    attendanceName: '01.20',
+    attendanceName: '11.10',
     numberInList: 2,
   },
   {
     id: '3',
     disciplineId: '1',
-    attendanceName: '01.22',
+    attendanceName: '15.10',
     numberInList: 3,
   },
   {
     id: '4',
     disciplineId: '1',
-    attendanceName: '01.31',
+    attendanceName: '02.11',
     numberInList: 4,
   },
   {
@@ -35,80 +35,32 @@ const attendances = [
   {
     id: '6',
     disciplineId: '2',
-    attendanceName: '02.20',
+    attendanceName: '05.12',
     numberInList: 2,
   },
   {
     id: '7',
     disciplineId: '2',
-    attendanceName: '02.132',
+    attendanceName: '12.12',
     numberInList: 3,
   },
   {
     id: '8',
     disciplineId: '2',
-    attendanceName: '02.32410',
+    attendanceName: '22.12',
     numberInList: 4,
   },
   {
     id: '9',
     disciplineId: '2',
-    attendanceName: '02.2310',
+    attendanceName: '25.12',
     numberInList: 5,
   },
   {
     id: '10',
     disciplineId: '2',
-    attendanceName: '02.610',
+    attendanceName: '30.12',
     numberInList: 6,
-  },
-  {
-    id: '11',
-    disciplineId: '2',
-    attendanceName: '02.106',
-    numberInList: 7,
-  },
-  {
-    id: '12',
-    disciplineId: '3',
-    attendanceName: '03.103',
-    numberInList: 1,
-  },
-  {
-    id: '13',
-    disciplineId: '3',
-    attendanceName: '03.10',
-    numberInList: 3,
-  },
-  {
-    id: '14',
-    disciplineId: '3',
-    attendanceName: '03.10',
-    numberInList: 3,
-  },
-  {
-    id: '15',
-    disciplineId: '3',
-    attendanceName: '03.10',
-    numberInList: 4,
-  },
-  {
-    id: '16',
-    disciplineId: '3',
-    attendanceName: '03.10',
-    numberInList: 5,
-  },
-  {
-    id: '17',
-    disciplineId: '3',
-    attendanceName: '03.10',
-    numberInList: 6,
-  },
-  {
-    id: '18',
-    disciplineId: '3',
-    attendanceName: '03.10',
-    numberInList: 7,
   },
 ];
 
