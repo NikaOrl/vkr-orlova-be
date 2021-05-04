@@ -25,6 +25,7 @@ import { LoggerMiddleware } from './logger';
 import { MarksModule } from './marks/marks.module';
 import { DisciplinesModule } from './disciplines/disciplines.module';
 import { ModulesModule } from './modules/modules.module';
+import { AttendancesModule } from './attendances/attendances.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { ModulesModule } from './modules/modules.module';
     MarksModule,
     DisciplinesModule,
     ModulesModule,
+    AttendancesModule,
   ],
   controllers: [
     AppController,
