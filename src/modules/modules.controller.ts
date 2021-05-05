@@ -1,5 +1,8 @@
 import { Body, Controller, Get, Put, Query } from '@nestjs/common';
+
 import { ModulesService } from './modules.service';
+
+import { ResultStatus } from '../../common/types/ResultStatus';
 
 @Controller('modules')
 export class ModulesController {
@@ -15,15 +18,9 @@ export class ModulesController {
 
   @Put('')
   async updateModulesWithJobs(
-    @Query('disciplineId') disciplineId: string,
-    @Query('groupId') groupId: string,
     @Body() modulesWithJobs: any,
-  ): Promise<any> {
-    await this.modulesService.updateModulesWithJobs(
-      disciplineId,
-      groupId,
-      modulesWithJobs,
-    );
+  ): Promise<ResultStatus> {
+    await this.modulesService.updateModulesWithJobs(modulesWithJobs);
 
     return {
       status: 'success',

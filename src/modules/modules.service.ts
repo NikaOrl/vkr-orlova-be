@@ -1,12 +1,14 @@
 import * as R from 'ramda';
+import { v4 as uuid } from 'uuid';
 import { Injectable } from '@nestjs/common';
 
 import { KnexService } from '../knex/knex.service';
+import { JobsService } from '../jobs/jobs.service';
+
 import { Module, ModuleDB } from './modules.interface';
 import { Job, JobDB } from '../jobs/jobs.interface';
 import { StudentDB, StudentDisciplineDB } from '../students/students.interface';
 import { MarkDB } from '../marks/marks.interface';
-import { JobsService } from '../jobs/jobs.service';
 
 export interface IGetModulesWithJobs extends Module {
   jobs: Array<Job>;
@@ -83,31 +85,74 @@ export class ModulesService {
     });
   }
 
-  async updateModulesWithJobs(
-    disciplineId: string,
-    groupId: string,
-    data: any,
-  ): Promise<any> {
-    const updatedModules = R.map(R.omit(['jobs']))(data);
-
+  async updateModulesWithJobs(modulesWithJobs: any): Promise<void> {
     await Promise.all(
-      updatedModules.map(async (moduleData) => {
-        return await this.updateModule(moduleData.id, moduleData);
-      }),
-    );
+      modulesWithJobs.map(async (moduleWithJobs) => {
+        const moduleData = R.omit(['jobs'])(moduleWithJobs);
 
-    const updatedJobs = R.pipe(R.map(R.prop('jobs')), R.flatten)(data);
+        const newModuleId = await this.moduleCDU(moduleData);
 
-    await Promise.all(
-      updatedJobs.map(async (jobData) => {
-        return await this.jobsService.updateJob(jobData);
+        const jobs = R.pipe(
+          R.prop('jobs'),
+          R.map((job) => {
+            const moduleId = newModuleId ? newModuleId : moduleData.id;
+
+            const id = newModuleId ? null : job.id;
+
+            return {
+              ...job,
+              id,
+              moduleId,
+              deleted: moduleData.deleted,
+            };
+          }),
+        )(moduleWithJobs);
+
+        await Promise.all(
+          jobs.map(async (job) => {
+            await this.jobsService.jobCDU(job);
+          }),
+        );
       }),
     );
   }
 
-  async updateModule(id: string, data): Promise<void> {
+  async updateModule(id: string, moduleData: ModuleDB): Promise<void> {
     const knex = this.knexService.getKnex();
 
-    await knex('modules').where('id', id).update(data);
+    await knex<ModuleDB>('modules').where('id', id).update(moduleData);
+  }
+
+  async createModule(moduleData: ModuleDB): Promise<string> {
+    const knex = this.knexService.getKnex();
+
+    const id = uuid();
+
+    await knex<ModuleDB>('modules').insert({
+      id,
+      ...moduleData,
+    });
+
+    return id;
+  }
+
+  async deleteModule(id: string): Promise<void> {
+    const knex = this.knexService.getKnex();
+
+    await knex<ModuleDB>('modules').where('id', id).update('deleted', true);
+  }
+
+  async moduleCDU(moduleData: ModuleDB): Promise<string | void> {
+    if (moduleData.deleted) {
+      return await this.deleteModule(moduleData.id);
+    }
+
+    if (!moduleData.id || Number(moduleData.id) < 0) {
+      const newModuleData = R.omit(['id'])(moduleData);
+
+      return await this.createModule(newModuleData);
+    }
+
+    return await this.updateModule(moduleData.id, moduleData);
   }
 }

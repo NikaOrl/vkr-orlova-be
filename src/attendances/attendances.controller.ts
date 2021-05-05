@@ -1,6 +1,7 @@
 import { Body, Controller, Get, Put, Query } from '@nestjs/common';
 
 import { AttendancesService } from './attendances.service';
+import { ResultStatus } from "../../common/types/ResultStatus";
 
 @Controller('attendances')
 export class AttendancesController {
@@ -15,7 +16,7 @@ export class AttendancesController {
   }
 
   @Put()
-  async updateAttendances(@Body() body: any): Promise<any> {
+  async updateAttendances(@Body() body: any): Promise<ResultStatus> {
     await this.attendancesService.updateAttendancesWithMarks(body);
 
     return {
