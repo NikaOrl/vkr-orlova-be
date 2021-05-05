@@ -5,10 +5,14 @@ import { KnexService } from '../knex/knex.service';
 
 import { StudentDisciplineDB } from '../students/students.interface';
 import { AttendanceMarksDB } from './attendances.interface';
+import { AttendanceMarksService } from '../attendance-marks/attendance-marks.service';
 
 @Injectable()
 export class AttendancesService {
-  constructor(private readonly knexService: KnexService) {}
+  constructor(
+    private readonly knexService: KnexService,
+    private readonly attendanceMarksService: AttendanceMarksService,
+  ) {}
 
   async getAttendances(disciplineId: string, groupId: string): Promise<any> {
     const knex = this.knexService.getKnex();
@@ -63,8 +67,37 @@ export class AttendancesService {
     };
   }
 
-  async updateAttendances(disciplineId: string, groupId: string, body: any) {
+  async updateAttendancesWithMarks(
+    disciplineId: string,
+    groupId: string,
+    data: any,
+  ) {
+    const updatedAttendances = R.map(R.pick(['id', 'attendanceName']))(data);
 
-    return
+    const promises1 = updatedAttendances.map(async (attendanceData) => {
+      return await this.updateAttendance(attendanceData.id, attendanceData);
+    });
+
+    await Promise.all(promises1);
+
+    const updatedAttendanceMarks = R.pipe(
+      R.map(R.prop('attendanceMarks')),
+      R.flatten,
+    )(data);
+
+    const promises2 = updatedAttendanceMarks.map(async (attendanceMarkData) => {
+      return await this.attendanceMarksService.updateAttendanceMark(
+        attendanceMarkData.id,
+        attendanceMarkData,
+      );
+    });
+
+    await Promise.all(promises2);
+  }
+
+  async updateAttendance(id: string, data): Promise<void> {
+    const knex = this.knexService.getKnex();
+
+    await knex('attendances').where('id', id).update(data);
   }
 }

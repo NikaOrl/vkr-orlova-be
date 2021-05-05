@@ -20,10 +20,14 @@ export class AttendancesController {
     @Query('groupId') groupId: string,
     @Body() body: any,
   ): Promise<any> {
-    return this.attendancesService.updateAttendances(
+    await this.attendancesService.updateAttendancesWithMarks(
       disciplineId,
       groupId,
       body,
     );
+
+    return {
+      status: 'success',
+    };
   }
 }
