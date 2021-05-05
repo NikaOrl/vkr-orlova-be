@@ -10,10 +10,14 @@ import { StudentDisciplineDB } from '../students/students.interface';
 import { JobDB } from '../jobs/jobs.interface';
 import { ModuleDB } from '../modules/modules.interface';
 import { DisciplinesDB } from '../disciplines/disciplines.interface';
+import { JobsService } from '../jobs/jobs.service';
 
 @Injectable()
 export class MarksService {
-  constructor(private readonly knexService: KnexService) {}
+  constructor(
+    private readonly knexService: KnexService,
+    private readonly jobsService: JobsService,
+  ) {}
 
   async getMarks(disciplineId: string, groupId: string): Promise<any> {
     const knex = this.knexService.getKnex();
@@ -138,7 +142,7 @@ export class MarksService {
     const knex = this.knexService.getKnex();
 
     if (mark.id === null) {
-      return await knex('marks').insert(mark);
+      return knex('marks').insert(mark);
     }
 
     return knex('marks').where('id', mark.id).update(mark);
@@ -148,5 +152,27 @@ export class MarksService {
     const knex = this.knexService.getKnex();
 
     return knex('marks').whereIn('jobId', jobIds).update('deleted', true);
+  }
+
+  async updateJobsWithMarks(
+    disciplineId: string,
+    groupId: string,
+    data: any,
+  ): Promise<void> {
+    const updatedJobs = R.map(R.omit(['marks']))(data);
+
+    await Promise.all(
+      updatedJobs.map(async (jobData) => {
+        return await this.jobsService.updateJob(jobData);
+      }),
+    );
+
+    const updatedMarks = R.pipe(R.map(R.prop('marks')), R.flatten)(data);
+
+    await Promise.all(
+      updatedMarks.map(async (marksData) => {
+        return await this.updateMark(marksData);
+      }),
+    );
   }
 }

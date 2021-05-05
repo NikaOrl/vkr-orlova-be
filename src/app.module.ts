@@ -27,6 +27,7 @@ import { DisciplinesModule } from './disciplines/disciplines.module';
 import { ModulesModule } from './modules/modules.module';
 import { AttendancesModule } from './attendances/attendances.module';
 import { AttendanceMarksModule } from './attendance-marks/attendance-marks.module';
+import { JobsModule } from './jobs/jobs.module';
 
 @Module({
   imports: [
@@ -38,6 +39,7 @@ import { AttendanceMarksModule } from './attendance-marks/attendance-marks.modul
     ModulesModule,
     AttendancesModule,
     AttendanceMarksModule,
+    JobsModule,
   ],
   controllers: [
     AppController,

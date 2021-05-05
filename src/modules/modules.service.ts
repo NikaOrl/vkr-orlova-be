@@ -6,6 +6,7 @@ import { Module, ModuleDB } from './modules.interface';
 import { Job, JobDB } from '../jobs/jobs.interface';
 import { StudentDB, StudentDisciplineDB } from '../students/students.interface';
 import { MarkDB } from '../marks/marks.interface';
+import { JobsService } from '../jobs/jobs.service';
 
 export interface IGetModulesWithJobs extends Module {
   jobs: Array<Job>;
@@ -13,7 +14,10 @@ export interface IGetModulesWithJobs extends Module {
 
 @Injectable()
 export class ModulesService {
-  constructor(private readonly knexService: KnexService) {}
+  constructor(
+    private readonly knexService: KnexService,
+    private readonly jobsService: JobsService,
+  ) {}
 
   async getModulesWithJobs(
     disciplineId: string,
@@ -79,8 +83,31 @@ export class ModulesService {
     });
   }
 
-  // async updateModulesWithJobs(disciplineId: string): Promise<any> {
-  //   const knex = this.knexService.getKnex();
-  //
-  // }
+  async updateModulesWithJobs(
+    disciplineId: string,
+    groupId: string,
+    data: any,
+  ): Promise<any> {
+    const updatedModules = R.map(R.omit(['jobs']))(data);
+
+    await Promise.all(
+      updatedModules.map(async (moduleData) => {
+        return await this.updateModule(moduleData.id, moduleData);
+      }),
+    );
+
+    const updatedJobs = R.pipe(R.map(R.prop('jobs')), R.flatten)(data);
+
+    await Promise.all(
+      updatedJobs.map(async (jobData) => {
+        return await this.jobsService.updateJob(jobData);
+      }),
+    );
+  }
+
+  async updateModule(id: string, data): Promise<void> {
+    const knex = this.knexService.getKnex();
+
+    await knex('modules').where('id', id).update(data);
+  }
 }

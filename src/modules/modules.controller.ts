@@ -17,7 +17,16 @@ export class ModulesController {
   async updateModulesWithJobs(
     @Query('disciplineId') disciplineId: string,
     @Query('groupId') groupId: string,
+    @Body() modulesWithJobs: any,
   ): Promise<any> {
-    return this.modulesService.getModulesWithJobs(disciplineId, groupId);
+    await this.modulesService.updateModulesWithJobs(
+      disciplineId,
+      groupId,
+      modulesWithJobs,
+    );
+
+    return {
+      status: 'success',
+    };
   }
 }
