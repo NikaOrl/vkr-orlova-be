@@ -4,7 +4,7 @@ import { Injectable } from '@nestjs/common';
 
 import { KnexService } from '../knex/knex.service';
 
-import { StudentDisciplineDB } from '../students/students.interface';
+import { StudentDB, StudentDisciplineDB } from '../students/students.interface';
 import { AttendanceMarksDB, AttendancesDB } from './attendances.interface';
 import { AttendanceMarksService } from '../attendance-marks/attendance-marks.service';
 
@@ -24,7 +24,11 @@ export class AttendancesService {
 
     const students = await knex<StudentDisciplineDB>('students-disciplines')
       .where('disciplineId', disciplineId)
-      .leftJoin('students', 'students-disciplines.studentId', 'students.id')
+      .leftJoin<StudentDB>(
+        'students',
+        'students-disciplines.studentId',
+        'students.id',
+      )
       .select([
         'studentId as id',
         'disciplineId',
@@ -86,7 +90,7 @@ export class AttendancesService {
 
           const attendanceMarks = R.pipe(
             R.prop('attendanceMarks'),
-            R.map((attendanceMark) => {
+            R.map((attendanceMark: AttendanceMarksDB) => {
               const attendanceId = newAttendanceId
                 ? newAttendanceId
                 : attendanceData.id;
@@ -118,7 +122,9 @@ export class AttendancesService {
     await knex<AttendancesDB>('attendances').where('id', id).update(data);
   }
 
-  async createAttendance(attendanceData: AttendancesDB): Promise<string> {
+  async createAttendance(
+    attendanceData: Omit<AttendancesDB, 'id'>,
+  ): Promise<string> {
     const knex = this.knexService.getKnex();
 
     const id = uuid();

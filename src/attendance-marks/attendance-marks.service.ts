@@ -22,7 +22,7 @@ export class AttendanceMarksService {
   }
 
   async createAttendanceMark(
-    attendanceMarkData: AttendanceMarksDB,
+    attendanceMarkData: Omit<AttendanceMarksDB, 'id'>,
   ): Promise<string> {
     const knex = this.knexService.getKnex();
 

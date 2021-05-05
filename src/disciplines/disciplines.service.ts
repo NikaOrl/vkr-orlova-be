@@ -158,7 +158,7 @@ export class DisciplinesService {
     })(groupsWithStudents);
   }
 
-  async updateStudentsWithDiscipline(disciplineId, groupsWithStudents) {
+  async updateStudentsWithDiscipline(disciplineId: string, groupsWithStudents) {
     const knex = this.knexService.getKnex();
 
     const currentStudentsWithDiscipline = await knex

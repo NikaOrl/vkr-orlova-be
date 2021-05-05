@@ -16,7 +16,7 @@ export class JobsService {
     await knex<JobDB>('jobs').where('id', id).update(jobData);
   }
 
-  async createJob(jobData: JobDB): Promise<string> {
+  async createJob(jobData: Omit<JobDB, 'id'>): Promise<string> {
     const knex = this.knexService.getKnex();
 
     const id = uuid();

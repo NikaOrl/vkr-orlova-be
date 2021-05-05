@@ -142,7 +142,7 @@ export class MarksService {
 
         const marks = R.pipe(
           R.prop('marks'),
-          R.map((mark) => {
+          R.map((mark: MarkDB) => {
             const jobId = newJobId ? newJobId : jobData.id;
 
             const id = newJobId ? null : mark.id;
@@ -171,7 +171,7 @@ export class MarksService {
     await knex<MarkDB>('marks').where('id', id).update(markData);
   }
 
-  async createMark(markData: MarkDB): Promise<string> {
+  async createMark(markData: Omit<MarkDB, 'id'>): Promise<string> {
     const knex = this.knexService.getKnex();
 
     const id = uuid();

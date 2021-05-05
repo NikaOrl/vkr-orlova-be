@@ -100,7 +100,7 @@ export class ModulesService {
 
         const jobs = R.pipe(
           R.prop('jobs'),
-          R.map((job) => {
+          R.map((job: JobDB) => {
             const moduleId = newModuleId ? newModuleId : moduleData.id;
 
             return {
@@ -126,7 +126,7 @@ export class ModulesService {
     await knex<ModuleDB>('modules').where('id', id).update(moduleData);
   }
 
-  async createModule(moduleData: ModuleDB): Promise<string> {
+  async createModule(moduleData: Omit<ModuleDB, 'id'>): Promise<string> {
     const knex = this.knexService.getKnex();
 
     const id = uuid();
