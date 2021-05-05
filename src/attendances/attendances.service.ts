@@ -1,10 +1,11 @@
 import * as R from 'ramda';
+import { v4 as uuid } from 'uuid';
 import { Injectable } from '@nestjs/common';
 
 import { KnexService } from '../knex/knex.service';
 
 import { StudentDisciplineDB } from '../students/students.interface';
-import { AttendanceMarksDB } from './attendances.interface';
+import { AttendanceMarksDB, AttendancesDB } from './attendances.interface';
 import { AttendanceMarksService } from '../attendance-marks/attendance-marks.service';
 
 @Injectable()
@@ -68,36 +69,80 @@ export class AttendancesService {
   }
 
   async updateAttendancesWithMarks(
-    disciplineId: string,
-    groupId: string,
-    data: any,
-  ) {
-    const updatedAttendances = R.map(R.pick(['id', 'attendanceName']))(data);
+    attendancesWithAttendancesMarks: any,
+  ): Promise<void> {
+    await Promise.all(
+      attendancesWithAttendancesMarks.map(
+        async (attendanceWithAttendancesMarks) => {
+          const attendanceData = R.omit(['attendanceMarks'])(
+            attendanceWithAttendancesMarks,
+          );
 
-    const promises1 = updatedAttendances.map(async (attendanceData) => {
-      return await this.updateAttendance(attendanceData.id, attendanceData);
-    });
+          const newAttendanceId = await this.attendanceCDU(attendanceData);
 
-    await Promise.all(promises1);
+          const attendanceMarks = R.pipe(
+            R.prop('attendanceMarks'),
+            R.map((attendanceMark) => {
+              const attendanceId = newAttendanceId
+                ? newAttendanceId
+                : attendanceData.id;
 
-    const updatedAttendanceMarks = R.pipe(
-      R.map(R.prop('attendanceMarks')),
-      R.flatten,
-    )(data);
+              return {
+                ...attendanceMark,
+                attendanceId: attendanceId,
+                deleted: attendanceData.deleted,
+              };
+            }),
+          )(attendanceWithAttendancesMarks);
 
-    const promises2 = updatedAttendanceMarks.map(async (attendanceMarkData) => {
-      return await this.attendanceMarksService.updateAttendanceMark(
-        attendanceMarkData.id,
-        attendanceMarkData,
-      );
-    });
-
-    await Promise.all(promises2);
+          await Promise.all(
+            attendanceMarks.map(async (attendanceMark) => {
+              await this.attendanceMarksService.attendanceCDU(attendanceMark);
+            }),
+          );
+        },
+      ),
+    );
   }
 
-  async updateAttendance(id: string, data): Promise<void> {
+  async updateAttendance(id: string, data: AttendancesDB): Promise<void> {
     const knex = this.knexService.getKnex();
 
-    await knex('attendances').where('id', id).update(data);
+    await knex<AttendancesDB>('attendances').where('id', id).update(data);
+  }
+
+  async createAttendance(attendanceData: AttendancesDB): Promise<string> {
+    const knex = this.knexService.getKnex();
+
+    const id = uuid();
+
+    await knex<AttendancesDB>('attendances').insert({
+      id: uuid(),
+      ...attendanceData,
+    });
+
+    return id;
+  }
+
+  async deleteAttendance(id: string): Promise<void> {
+    const knex = this.knexService.getKnex();
+
+    await knex<AttendancesDB>('attendances')
+      .where('id', id)
+      .update('deleted', true);
+  }
+
+  async attendanceCDU(attendanceData: AttendancesDB): Promise<string | void> {
+    if (attendanceData.deleted) {
+      return await this.deleteAttendance(attendanceData.id);
+    }
+
+    if (Number(attendanceData.id) < 0) {
+      const newAttendanceData = R.omit(['id'])(attendanceData);
+
+      return await this.createAttendance(newAttendanceData);
+    }
+
+    return await this.updateAttendance(attendanceData.id, attendanceData);
   }
 }

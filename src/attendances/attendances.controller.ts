@@ -15,16 +15,8 @@ export class AttendancesController {
   }
 
   @Put()
-  async updateAttendances(
-    @Query('disciplineId') disciplineId: string,
-    @Query('groupId') groupId: string,
-    @Body() body: any,
-  ): Promise<any> {
-    await this.attendancesService.updateAttendancesWithMarks(
-      disciplineId,
-      groupId,
-      body,
-    );
+  async updateAttendances(@Body() body: any): Promise<any> {
+    await this.attendancesService.updateAttendancesWithMarks(body);
 
     return {
       status: 'success',
