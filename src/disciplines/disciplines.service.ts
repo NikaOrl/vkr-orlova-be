@@ -3,6 +3,7 @@ import { v4 as uuid } from 'uuid';
 import { Injectable } from '@nestjs/common';
 
 import { KnexService } from '../knex/knex.service';
+import { DisciplinesDB } from './disciplines.interface';
 
 @Injectable()
 export class DisciplinesService {
@@ -11,14 +12,20 @@ export class DisciplinesService {
   async getDisciplinesWithTeachers() {
     const knex = this.knexService.getKnex();
 
-    const disciplinesTeachers = await knex
-      .from('disciplines')
+    const disciplinesTeachers = await knex<DisciplinesDB>('disciplines')
       .leftJoin(
         'disciplines-teachers',
         'disciplines.id',
         'disciplines-teachers.disciplineId',
       )
-      .select(['disciplineValue', 'semesterId', 'disciplineId', 'teacherId']);
+      .select([
+        'disciplineValue',
+        'semesterId',
+        'disciplineId',
+        'teacherId',
+        'attendanceWeight',
+        'countWithAttendance',
+      ]);
 
     return disciplinesTeachers.reduce(
       (acc, { disciplineId, teacherId, ...data }) => {
@@ -85,6 +92,8 @@ export class DisciplinesService {
 
     await knex('disciplines').where('id', id).update({
       disciplineValue: data.disciplineValue,
+      attendanceWeight: data.attendanceWeight,
+      countWithAttendance: data.countWithAttendance,
     });
 
     if (!R.isEmpty(teacherIdsToAddToDiscipline)) {

@@ -3,7 +3,13 @@ import { v4 as uuid } from 'uuid';
 import { Injectable } from '@nestjs/common';
 
 import { KnexService } from '../knex/knex.service';
+
 import { MarkDB } from './marks.interface';
+import { AttendanceMarksDB } from '../attendances/attendances.interface';
+import { StudentDisciplineDB } from '../students/students.interface';
+import { JobDB } from '../jobs/jobs.interface';
+import { ModuleDB } from '../modules/modules.interface';
+import { DisciplinesDB } from '../disciplines/disciplines.interface';
 
 @Injectable()
 export class MarksService {
@@ -12,8 +18,7 @@ export class MarksService {
   async getMarks(disciplineId: string, groupId: string): Promise<any> {
     const knex = this.knexService.getKnex();
 
-    const students = await knex
-      .from('students-disciplines')
+    const students = await knex<StudentDisciplineDB>('students-disciplines')
       .where('disciplineId', disciplineId)
       .leftJoin('students', 'students-disciplines.studentId', 'students.id')
       .select([
@@ -30,6 +35,26 @@ export class MarksService {
 
     const studentIds = R.map(R.prop('id'))(students);
 
+    const studentAttendanceMarks = await knex<AttendanceMarksDB>(
+      'attendance-marks',
+    )
+      .select(['id', 'studentId', 'attendanceId', 'attendanceMarkValue'])
+      .whereIn('studentId', studentIds)
+      .andWhere('deleted', false);
+
+    const studentAttendances = studentIds.map((studentId) => {
+      const attendance = R.pipe(
+        R.filter(R.propEq('studentId', studentId)),
+        R.filter(R.propEq('attendanceMarkValue', 1)),
+        R.length,
+      )(studentAttendanceMarks);
+
+      return {
+        id: studentId,
+        attendance,
+      };
+    });
+
     const marks = await knex<MarkDB>('marks')
       .select(['id', 'studentId', 'jobId', 'markValue', 'deleted'])
       .whereIn('studentId', studentIds)
@@ -37,7 +62,7 @@ export class MarksService {
 
     const jobIds = R.pipe(R.map(R.prop('jobId')), R.uniq)(marks);
 
-    const jobs = await knex('jobs')
+    const jobs = await knex<JobDB>('jobs')
       .select([
         'id',
         'disciplineId',
@@ -52,11 +77,14 @@ export class MarksService {
 
     const moduleIds = R.pipe(R.map(R.prop('moduleId')), R.uniq)(jobs);
 
-    const modules = await knex
-      .from('modules')
+    const modules = await knex<ModuleDB>('modules')
       .select(['id', 'moduleName', 'numberInList'])
       .whereIn('id', moduleIds)
       .andWhere('deleted', false);
+
+    const [discipline] = await knex<DisciplinesDB>('disciplines')
+      .select(['attendanceWeight', 'countWithAttendance'])
+      .where('id', disciplineId);
 
     const resultJobs = jobs.map((job) => {
       const jobMarks = R.filter(R.propEq('jobId', job.id))(marks);
@@ -67,8 +95,31 @@ export class MarksService {
       };
     });
 
+    const resultStudents = R.map((student) => {
+      const attendance = R.pipe(
+        R.find(R.propEq('id', student.id)),
+        R.prop('attendance'),
+      )(studentAttendances);
+
+      return {
+        ...student,
+        attendance,
+      };
+    })(students);
+
+    const maxAttendance = R.pipe(
+      R.map(R.prop('attendanceId')),
+      R.uniq,
+      R.length,
+    )(studentAttendanceMarks);
+
+    const { attendanceWeight, countWithAttendance } = discipline;
+
     return {
-      students,
+      maxAttendance,
+      attendanceWeight,
+      countWithAttendance,
+      students: resultStudents,
       modules,
       jobs: resultJobs,
     };
