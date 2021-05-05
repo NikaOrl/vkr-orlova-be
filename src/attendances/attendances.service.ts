@@ -8,6 +8,10 @@ import { StudentDisciplineDB } from '../students/students.interface';
 import { AttendanceMarksDB, AttendancesDB } from './attendances.interface';
 import { AttendanceMarksService } from '../attendance-marks/attendance-marks.service';
 
+export interface IAttendancesWithAttendancesMarks extends AttendancesDB {
+  attendanceMarks: AttendanceMarksDB[];
+}
+
 @Injectable()
 export class AttendancesService {
   constructor(
@@ -69,7 +73,7 @@ export class AttendancesService {
   }
 
   async updateAttendancesWithMarks(
-    attendancesWithAttendancesMarks: any,
+    attendancesWithAttendancesMarks: IAttendancesWithAttendancesMarks[],
   ): Promise<void> {
     await Promise.all(
       attendancesWithAttendancesMarks.map(

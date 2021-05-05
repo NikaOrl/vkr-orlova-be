@@ -3,6 +3,7 @@ import { Body, Controller, Get, Put, Query } from '@nestjs/common';
 import { AttendancesService } from './attendances.service';
 
 import { ResultStatus } from '../../common/types/ResultStatus';
+import { UpdateAttendancesWithAttendancesMarksDto } from './dto/update-attendances-with-attendances-marks.dto';
 
 @Controller('attendances')
 export class AttendancesController {
@@ -17,8 +18,13 @@ export class AttendancesController {
   }
 
   @Put()
-  async updateAttendances(@Body() body: any): Promise<ResultStatus> {
-    await this.attendancesService.updateAttendancesWithMarks(body);
+  async updateAttendances(
+    @Body()
+    attendancesWithAttendancesMarks: UpdateAttendancesWithAttendancesMarksDto[],
+  ): Promise<ResultStatus> {
+    await this.attendancesService.updateAttendancesWithMarks(
+      attendancesWithAttendancesMarks,
+    );
 
     return {
       status: 'success',

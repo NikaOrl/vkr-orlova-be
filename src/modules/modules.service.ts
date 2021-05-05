@@ -14,6 +14,10 @@ export interface IGetModulesWithJobs extends Module {
   jobs: Array<Job>;
 }
 
+export interface IUpdateModulesWithJobs extends ModuleDB {
+  jobs: JobDB[];
+}
+
 @Injectable()
 export class ModulesService {
   constructor(
@@ -85,7 +89,9 @@ export class ModulesService {
     });
   }
 
-  async updateModulesWithJobs(modulesWithJobs: any): Promise<void> {
+  async updateModulesWithJobs(
+    modulesWithJobs: IUpdateModulesWithJobs[],
+  ): Promise<void> {
     await Promise.all(
       modulesWithJobs.map(async (moduleWithJobs) => {
         const moduleData = R.omit(['jobs'])(moduleWithJobs);
@@ -97,11 +103,8 @@ export class ModulesService {
           R.map((job) => {
             const moduleId = newModuleId ? newModuleId : moduleData.id;
 
-            const id = newModuleId ? null : job.id;
-
             return {
               ...job,
-              id,
               moduleId,
               deleted: moduleData.deleted,
             };

@@ -3,6 +3,7 @@ import { Body, Controller, Get, Put, Query } from '@nestjs/common';
 import { ModulesService } from './modules.service';
 
 import { ResultStatus } from '../../common/types/ResultStatus';
+import { UpdateModulesWithJobsDto } from './dto/update-modules-with-jobs.dto';
 
 @Controller('modules')
 export class ModulesController {
@@ -18,7 +19,7 @@ export class ModulesController {
 
   @Put('')
   async updateModulesWithJobs(
-    @Body() modulesWithJobs: any,
+    @Body() modulesWithJobs: UpdateModulesWithJobsDto[],
   ): Promise<ResultStatus> {
     await this.modulesService.updateModulesWithJobs(modulesWithJobs);
 
