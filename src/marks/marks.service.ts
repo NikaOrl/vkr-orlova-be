@@ -12,6 +12,10 @@ import { JobDB } from '../jobs/jobs.interface';
 import { ModuleDB } from '../modules/modules.interface';
 import { DisciplinesDB } from '../disciplines/disciplines.interface';
 
+export interface IJobsWithMarks extends JobDB {
+  marks: MarkDB[];
+}
+
 @Injectable()
 export class MarksService {
   constructor(
@@ -129,7 +133,7 @@ export class MarksService {
     };
   }
 
-  async updateJobsWithMarks(jobsWithMarks: any): Promise<void> {
+  async updateJobsWithMarks(jobsWithMarks: IJobsWithMarks[]): Promise<void> {
     await Promise.all(
       jobsWithMarks.map(async (jobWithMarks) => {
         const jobData = R.omit(['marks'])(jobWithMarks);
