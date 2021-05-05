@@ -92,7 +92,7 @@ export class AttendancesService {
               return {
                 ...attendanceMark,
                 id,
-                attendanceId: attendanceId,
+                attendanceId,
                 deleted: attendanceData.deleted,
               };
             }),

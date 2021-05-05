@@ -1,7 +1,8 @@
 import { Body, Controller, Get, Put, Query } from '@nestjs/common';
 
 import { AttendancesService } from './attendances.service';
-import { ResultStatus } from "../../common/types/ResultStatus";
+
+import { ResultStatus } from '../../common/types/ResultStatus';
 
 @Controller('attendances')
 export class AttendancesController {

@@ -39,16 +39,8 @@ export class MarksController {
   // }
 
   @Put()
-  async updateMarks(
-    @Query('disciplineId') disciplineId: string,
-    @Query('groupId') groupId: string,
-    @Body() jobsWithMarks: any,
-  ): Promise<ResultStatus> {
-    await this.marksService.updateJobsWithMarks(
-      disciplineId,
-      groupId,
-      jobsWithMarks,
-    );
+  async updateMarks(@Body() jobsWithMarks: any): Promise<ResultStatus> {
+    await this.marksService.updateJobsWithMarks(jobsWithMarks);
 
     return {
       status: 'success',
