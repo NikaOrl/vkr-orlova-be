@@ -22,7 +22,7 @@ export class AttendanceMarksService {
   }
 
   async createAttendanceMark(
-    attendanceData: AttendanceMarksDB,
+    attendanceMarkData: AttendanceMarksDB,
   ): Promise<string> {
     const knex = this.knexService.getKnex();
 
@@ -30,7 +30,7 @@ export class AttendanceMarksService {
 
     await knex<AttendanceMarksDB>('attendance-marks').insert({
       id,
-      ...attendanceData,
+      ...attendanceMarkData,
     });
 
     return id;
@@ -45,18 +45,21 @@ export class AttendanceMarksService {
   }
 
   async attendanceCDU(
-    attendanceData: AttendanceMarksDB,
+    attendanceMarkData: AttendanceMarksDB,
   ): Promise<string | void> {
-    if (attendanceData.deleted) {
-      return await this.deleteAttendanceMark(attendanceData.id);
+    if (attendanceMarkData.deleted) {
+      return await this.deleteAttendanceMark(attendanceMarkData.id);
     }
 
-    if (Number(attendanceData.id) < 0) {
-      const newAttendanceMarkData = R.omit(['id'])(attendanceData);
+    if (!attendanceMarkData.id || Number(attendanceMarkData.id) < 0) {
+      const newAttendanceMarkData = R.omit(['id'])(attendanceMarkData);
 
       return await this.createAttendanceMark(newAttendanceMarkData);
     }
 
-    return await this.updateAttendanceMark(attendanceData.id, attendanceData);
+    return await this.updateAttendanceMark(
+      attendanceMarkData.id,
+      attendanceMarkData,
+    );
   }
 }

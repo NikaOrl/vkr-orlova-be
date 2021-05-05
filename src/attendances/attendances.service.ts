@@ -47,8 +47,8 @@ export class AttendancesService {
 
     const attendances = await knex('attendances')
       .select(['id', 'disciplineId', 'attendanceName', 'numberInList'])
-      .where('disciplineId', disciplineId)
       .whereIn('id', attendanceIds)
+      .andWhere('disciplineId', disciplineId)
       .andWhere('deleted', false);
 
     const resultAttendances = attendances.map((attendance) => {
@@ -87,8 +87,11 @@ export class AttendancesService {
                 ? newAttendanceId
                 : attendanceData.id;
 
+              const id = newAttendanceId ? null : attendanceMark.id;
+
               return {
                 ...attendanceMark,
+                id,
                 attendanceId: attendanceId,
                 deleted: attendanceData.deleted,
               };
@@ -117,7 +120,7 @@ export class AttendancesService {
     const id = uuid();
 
     await knex<AttendancesDB>('attendances').insert({
-      id: uuid(),
+      id,
       ...attendanceData,
     });
 
@@ -137,7 +140,7 @@ export class AttendancesService {
       return await this.deleteAttendance(attendanceData.id);
     }
 
-    if (Number(attendanceData.id) < 0) {
+    if (!attendanceData.id || Number(attendanceData.id) < 0) {
       const newAttendanceData = R.omit(['id'])(attendanceData);
 
       return await this.createAttendance(newAttendanceData);
