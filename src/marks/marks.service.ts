@@ -3,6 +3,7 @@ import { v4 as uuid } from 'uuid';
 import { Injectable } from '@nestjs/common';
 
 import { KnexService } from '../knex/knex.service';
+import { JobsService } from '../jobs/jobs.service';
 
 import { MarkDB } from './marks.interface';
 import { AttendanceMarksDB } from '../attendances/attendances.interface';
@@ -11,9 +12,16 @@ import { JobDB } from '../jobs/jobs.interface';
 import { ModuleDB } from '../modules/modules.interface';
 import { DisciplinesDB } from '../disciplines/disciplines.interface';
 
+export interface IJobsWithMarks extends JobDB {
+  marks: MarkDB[];
+}
+
 @Injectable()
 export class MarksService {
-  constructor(private readonly knexService: KnexService) {}
+  constructor(
+    private readonly knexService: KnexService,
+    private readonly jobsService: JobsService,
+  ) {}
 
   async getMarks(disciplineId: string, groupId: string): Promise<any> {
     const knex = this.knexService.getKnex();
@@ -125,28 +133,74 @@ export class MarksService {
     };
   }
 
-  async createMark(mark) {
-    const knex = this.knexService.getKnex();
+  async updateJobsWithMarks(jobsWithMarks: IJobsWithMarks[]): Promise<void> {
+    await Promise.all(
+      jobsWithMarks.map(async (jobWithMarks) => {
+        const jobData = R.omit(['marks'])(jobWithMarks);
 
-    return knex('marks').insert({
-      id: uuid(),
-      ...mark,
-    });
+        const newJobId = await this.jobsService.jobCDU(jobData);
+
+        const marks = R.pipe(
+          R.prop('marks'),
+          R.map((mark: MarkDB) => {
+            const jobId = newJobId ? newJobId : jobData.id;
+
+            const id = newJobId ? null : mark.id;
+
+            return {
+              ...mark,
+              id,
+              jobId,
+              deleted: jobData.deleted,
+            };
+          }),
+        )(jobWithMarks);
+
+        await Promise.all(
+          marks.map(async (mark) => {
+            await this.markCDU(mark);
+          }),
+        );
+      }),
+    );
   }
 
-  async updateMark(mark) {
+  async updateMark(id: string, markData: MarkDB): Promise<void> {
     const knex = this.knexService.getKnex();
 
-    if (mark.id === null) {
-      return await knex('marks').insert(mark);
+    await knex<MarkDB>('marks').where('id', id).update(markData);
+  }
+
+  async createMark(markData: Omit<MarkDB, 'id'>): Promise<string> {
+    const knex = this.knexService.getKnex();
+
+    const id = uuid();
+
+    await knex<MarkDB>('marks').insert({
+      id,
+      ...markData,
+    });
+
+    return id;
+  }
+
+  async deleteMark(id: string): Promise<void> {
+    const knex = this.knexService.getKnex();
+
+    await knex<MarkDB>('marks').where('id', id).update('deleted', true);
+  }
+
+  async markCDU(markData: MarkDB): Promise<string | void> {
+    if (markData.deleted) {
+      return await this.deleteMark(markData.id);
     }
 
-    return knex('marks').where('id', mark.id).update(mark);
-  }
+    if (!markData.id || Number(markData.id) < 0) {
+      const newMarkData = R.omit(['id'])(markData);
 
-  async deleteMarks(jobIds: Array<string>) {
-    const knex = this.knexService.getKnex();
+      return await this.createMark(newMarkData);
+    }
 
-    return knex('marks').whereIn('jobId', jobIds).update('deleted', true);
+    return await this.updateMark(markData.id, markData);
   }
 }

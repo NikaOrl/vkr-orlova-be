@@ -1,11 +1,16 @@
 import * as R from 'ramda';
+import { v4 as uuid } from 'uuid';
 import { Injectable } from '@nestjs/common';
 
 import { KnexService } from '../knex/knex.service';
 
-import { StudentDisciplineDB } from '../students/students.interface';
-import { AttendanceMarksDB } from './attendances.interface';
+import { StudentDB, StudentDisciplineDB } from '../students/students.interface';
+import { AttendanceMarksDB, AttendancesDB } from './attendances.interface';
 import { AttendanceMarksService } from '../attendance-marks/attendance-marks.service';
+
+export interface IAttendancesWithAttendancesMarks extends AttendancesDB {
+  attendanceMarks: AttendanceMarksDB[];
+}
 
 @Injectable()
 export class AttendancesService {
@@ -19,7 +24,11 @@ export class AttendancesService {
 
     const students = await knex<StudentDisciplineDB>('students-disciplines')
       .where('disciplineId', disciplineId)
-      .leftJoin('students', 'students-disciplines.studentId', 'students.id')
+      .leftJoin<StudentDB>(
+        'students',
+        'students-disciplines.studentId',
+        'students.id',
+      )
       .select([
         'studentId as id',
         'disciplineId',
@@ -46,8 +55,8 @@ export class AttendancesService {
 
     const attendances = await knex('attendances')
       .select(['id', 'disciplineId', 'attendanceName', 'numberInList'])
-      .where('disciplineId', disciplineId)
       .whereIn('id', attendanceIds)
+      .andWhere('disciplineId', disciplineId)
       .andWhere('deleted', false);
 
     const resultAttendances = attendances.map((attendance) => {
@@ -68,36 +77,85 @@ export class AttendancesService {
   }
 
   async updateAttendancesWithMarks(
-    disciplineId: string,
-    groupId: string,
-    data: any,
-  ) {
-    const updatedAttendances = R.map(R.pick(['id', 'attendanceName']))(data);
+    attendancesWithAttendancesMarks: IAttendancesWithAttendancesMarks[],
+  ): Promise<void> {
+    await Promise.all(
+      attendancesWithAttendancesMarks.map(
+        async (attendanceWithAttendancesMarks) => {
+          const attendanceData = R.omit(['attendanceMarks'])(
+            attendanceWithAttendancesMarks,
+          );
 
-    const promises1 = updatedAttendances.map(async (attendanceData) => {
-      return await this.updateAttendance(attendanceData.id, attendanceData);
-    });
+          const newAttendanceId = await this.attendanceCDU(attendanceData);
 
-    await Promise.all(promises1);
+          const attendanceMarks = R.pipe(
+            R.prop('attendanceMarks'),
+            R.map((attendanceMark: AttendanceMarksDB) => {
+              const attendanceId = newAttendanceId
+                ? newAttendanceId
+                : attendanceData.id;
 
-    const updatedAttendanceMarks = R.pipe(
-      R.map(R.prop('attendanceMarks')),
-      R.flatten,
-    )(data);
+              const id = newAttendanceId ? null : attendanceMark.id;
 
-    const promises2 = updatedAttendanceMarks.map(async (attendanceMarkData) => {
-      return await this.attendanceMarksService.updateAttendanceMark(
-        attendanceMarkData.id,
-        attendanceMarkData,
-      );
-    });
+              return {
+                ...attendanceMark,
+                id,
+                attendanceId,
+                deleted: attendanceData.deleted,
+              };
+            }),
+          )(attendanceWithAttendancesMarks);
 
-    await Promise.all(promises2);
+          await Promise.all(
+            attendanceMarks.map(async (attendanceMark) => {
+              await this.attendanceMarksService.attendanceCDU(attendanceMark);
+            }),
+          );
+        },
+      ),
+    );
   }
 
-  async updateAttendance(id: string, data): Promise<void> {
+  async updateAttendance(id: string, data: AttendancesDB): Promise<void> {
     const knex = this.knexService.getKnex();
 
-    await knex('attendances').where('id', id).update(data);
+    await knex<AttendancesDB>('attendances').where('id', id).update(data);
+  }
+
+  async createAttendance(
+    attendanceData: Omit<AttendancesDB, 'id'>,
+  ): Promise<string> {
+    const knex = this.knexService.getKnex();
+
+    const id = uuid();
+
+    await knex<AttendancesDB>('attendances').insert({
+      id,
+      ...attendanceData,
+    });
+
+    return id;
+  }
+
+  async deleteAttendance(id: string): Promise<void> {
+    const knex = this.knexService.getKnex();
+
+    await knex<AttendancesDB>('attendances')
+      .where('id', id)
+      .update('deleted', true);
+  }
+
+  async attendanceCDU(attendanceData: AttendancesDB): Promise<string | void> {
+    if (attendanceData.deleted) {
+      return await this.deleteAttendance(attendanceData.id);
+    }
+
+    if (!attendanceData.id || Number(attendanceData.id) < 0) {
+      const newAttendanceData = R.omit(['id'])(attendanceData);
+
+      return await this.createAttendance(newAttendanceData);
+    }
+
+    return await this.updateAttendance(attendanceData.id, attendanceData);
   }
 }

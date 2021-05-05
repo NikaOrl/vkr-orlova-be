@@ -2,6 +2,9 @@ import { Body, Controller, Get, Put, Query } from '@nestjs/common';
 
 import { AttendancesService } from './attendances.service';
 
+import { ResultStatus } from '../../common/types/ResultStatus';
+import { UpdateAttendancesWithAttendancesMarksDto } from './dto/update-attendances-with-attendances-marks.dto';
+
 @Controller('attendances')
 export class AttendancesController {
   constructor(private attendancesService: AttendancesService) {}
@@ -16,14 +19,11 @@ export class AttendancesController {
 
   @Put()
   async updateAttendances(
-    @Query('disciplineId') disciplineId: string,
-    @Query('groupId') groupId: string,
-    @Body() body: any,
-  ): Promise<any> {
+    @Body()
+    attendancesWithAttendancesMarks: UpdateAttendancesWithAttendancesMarksDto[],
+  ): Promise<ResultStatus> {
     await this.attendancesService.updateAttendancesWithMarks(
-      disciplineId,
-      groupId,
-      body,
+      attendancesWithAttendancesMarks,
     );
 
     return {
