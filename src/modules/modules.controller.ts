@@ -5,7 +5,7 @@ import { ModulesService } from './modules.service';
 export class ModulesController {
   constructor(private modulesService: ModulesService) {}
 
-  @Get('/jobs')
+  @Get('')
   async getModulesWithJobs(
     @Query('disciplineId') disciplineId: string,
     @Query('groupId') groupId: string,
@@ -13,7 +13,7 @@ export class ModulesController {
     return this.modulesService.getModulesWithJobs(disciplineId, groupId);
   }
 
-  @Put('/jobs')
+  @Put('')
   async updateModulesWithJobs(
     @Query('disciplineId') disciplineId: string,
     @Query('groupId') groupId: string,
