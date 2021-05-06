@@ -8,9 +8,3 @@ export interface DisciplinesDB {
   four: number;
   three: number;
 }
-
-export interface DisciplineTeacherDB {
-  id: string;
-  disciplineId: string;
-  teacherId: string;
-}

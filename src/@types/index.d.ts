@@ -1,13 +1,11 @@
 import { TeacherDB } from '../teachers/teachers.interface';
 import { ModuleDB } from '../modules/modules.interface';
-import {
-  DisciplinesDB,
-  DisciplineTeacherDB,
-} from '../disciplines/disciplines.interface';
+import { DisciplinesDB } from '../disciplines/disciplines.interface';
 import { GroupDB } from '../groups/groups.interface';
 import { JobDB } from '../jobs/jobs.interface';
 import { MarkDB } from '../marks/marks.interface';
 import { StudentDB, StudentDisciplineDB } from '../students/students.interface';
+import { DisciplineTeacherDB } from '../disciplines-teachers/disciplines-teachers.interface';
 
 declare module 'knex/types/tables' {
   interface Tables {

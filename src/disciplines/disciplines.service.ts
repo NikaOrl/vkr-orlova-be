@@ -3,7 +3,9 @@ import { v4 as uuid } from 'uuid';
 import { Injectable } from '@nestjs/common';
 
 import { KnexService } from '../knex/knex.service';
-import { DisciplinesDB, DisciplineTeacherDB } from './disciplines.interface';
+import { DisciplinesTeachersService } from '../disciplines-teachers/disciplines-teachers.service';
+
+import { DisciplinesDB } from './disciplines.interface';
 
 export interface IDisciplineWithTeachers extends DisciplinesDB {
   teacherIds: string[];
@@ -16,11 +18,57 @@ export interface IDisciplineWithTeachers extends DisciplinesDB {
 
 @Injectable()
 export class DisciplinesService {
-  constructor(private readonly knexService: KnexService) {}
-
-  async getDisciplinesWithTeachers() {
+  constructor(
+    private readonly knexService: KnexService,
+    private readonly disciplinesTeachersService: DisciplinesTeachersService,
+  ) {}
+  async getDiscipline(id: string): Promise<DisciplinesDB> {
     const knex = this.knexService.getKnex();
 
+    const [discipline] = await knex<DisciplinesDB>('disciplines')
+      .where('id', id)
+      .select('*');
+
+    return discipline;
+  }
+
+  async updateDiscipline(
+    id: string,
+    disciplineData: Omit<DisciplinesDB, 'id'>,
+  ): Promise<void> {
+    const knex = this.knexService.getKnex();
+
+    await knex<DisciplinesDB>('disciplines')
+      .where('id', id)
+      .update(disciplineData);
+  }
+
+  async createDiscipline(
+    disciplineData: Omit<DisciplinesDB, 'id'>,
+  ): Promise<string> {
+    const knex = this.knexService.getKnex();
+
+    const id = uuid();
+
+    await knex<DisciplinesDB>('disciplines').insert({
+      id,
+      ...disciplineData,
+    });
+
+    return id;
+  }
+
+  async deleteDiscipline(id: string): Promise<void> {
+    const knex = this.knexService.getKnex();
+
+    await knex<DisciplinesDB>('disciplines')
+      .where('id', id)
+      .update('deleted', true);
+  }
+
+  async getDisciplinesWithTeachers(): Promise<IDisciplineWithTeachers[]> {
+    const knex = this.knexService.getKnex();
+    // TODO переделать запрос. Если у дисциплины нет учителя
     const disciplinesTeachers = await knex<DisciplinesDB>('disciplines')
       .leftJoin(
         'disciplines-teachers',
@@ -34,10 +82,14 @@ export class DisciplinesService {
         'teacherId',
         'attendanceWeight',
         'countWithAttendance',
-      ]);
+        'five',
+        'four',
+        'three',
+      ])
+      .where('deleted', false);
 
     return disciplinesTeachers.reduce(
-      (acc, { disciplineId, teacherId, ...data }) => {
+      (acc, { disciplineId, teacherId, ...disciplineWithTeachers }) => {
         const discipline = R.find(R.propEq('id', disciplineId))(acc);
 
         const accWithoutCurrent = acc.filter(
@@ -54,7 +106,15 @@ export class DisciplinesService {
             {
               id: disciplineId,
               teacherIds: [teacherId],
-              ...data,
+              disciplineValue: disciplineWithTeachers.disciplineValue,
+              attendanceWeight: disciplineWithTeachers.attendanceWeight,
+              countWithAttendance: disciplineWithTeachers.countWithAttendance,
+              semesterId: 'semesterId',
+              marksAreas: {
+                five: disciplineWithTeachers.five,
+                four: disciplineWithTeachers.four,
+                three: disciplineWithTeachers.three,
+              },
             },
           ];
         }
@@ -71,19 +131,13 @@ export class DisciplinesService {
   }
 
   async updateDisciplineWithTeachers(
-    id: string,
+    disciplineId: string,
     disciplineWithTeachers: IDisciplineWithTeachers,
   ): Promise<void> {
-    const knex = this.knexService.getKnex();
-
-    const currentTeachers = await knex<DisciplineTeacherDB>(
-      'disciplines-teachers',
-    )
-      .select('teacherId')
-      .where('disciplineId', id);
-
     const updatedTeacherIds = disciplineWithTeachers.teacherIds;
-    const currentTeacherIds = currentTeachers.map(R.prop('teacherId'));
+    const currentTeacherIds = await this.disciplinesTeachersService.getDisciplineTeacherIds(
+      disciplineId,
+    );
 
     const teacherIdsToAddToDiscipline = R.difference(
       updatedTeacherIds,
@@ -97,9 +151,8 @@ export class DisciplinesService {
 
     const teachersWithDisciplineIdToAdd = teacherIdsToAddToDiscipline.map(
       (teacherId) => ({
-        id: uuid(),
         teacherId,
-        disciplineId: id,
+        disciplineId,
       }),
     );
 
@@ -107,23 +160,59 @@ export class DisciplinesService {
       disciplineValue: disciplineWithTeachers.disciplineValue,
       attendanceWeight: disciplineWithTeachers.attendanceWeight,
       countWithAttendance: disciplineWithTeachers.countWithAttendance,
+      semesterId: 'semesterId',
       ...disciplineWithTeachers.marksAreas,
     };
 
-    await knex<DisciplinesDB>('disciplines')
-      .where('id', id)
-      .update(disciplineDataToUpdate);
+    await this.updateDiscipline(disciplineId, disciplineDataToUpdate);
 
     if (!R.isEmpty(teacherIdsToAddToDiscipline)) {
-      await knex('disciplines-teachers').insert(teachersWithDisciplineIdToAdd);
+      await this.disciplinesTeachersService.addDisciplineTeachers(
+        teachersWithDisciplineIdToAdd,
+      );
     }
 
     if (!R.isEmpty(teacherIdsToRemoveFromDiscipline)) {
-      await knex('disciplines-teachers')
-        .where('disciplineId', id)
-        .whereIn('teacherId', teacherIdsToRemoveFromDiscipline)
-        .delete();
+      await this.disciplinesTeachersService.deleteDisciplineTeachers(
+        disciplineId,
+        teacherIdsToRemoveFromDiscipline,
+      );
     }
+  }
+
+  async createDisciplineWithTeachers(
+    disciplineWithTeachers: IDisciplineWithTeachers,
+  ): Promise<void> {
+    const disciplineDataToAdd = {
+      disciplineValue: disciplineWithTeachers.disciplineValue,
+      attendanceWeight: disciplineWithTeachers.attendanceWeight,
+      countWithAttendance: disciplineWithTeachers.countWithAttendance,
+      semesterId: 'semesterId',
+      ...disciplineWithTeachers.marksAreas,
+    };
+
+    const disciplineId = await this.createDiscipline(disciplineDataToAdd);
+
+    const teachersWithDisciplineIdToAdd = disciplineWithTeachers.teacherIds.map(
+      (teacherId) => ({
+        teacherId,
+        disciplineId,
+      }),
+    );
+
+    if (!R.isEmpty(teachersWithDisciplineIdToAdd)) {
+      await this.disciplinesTeachersService.addDisciplineTeachers(
+        teachersWithDisciplineIdToAdd,
+      );
+    }
+  }
+
+  async deleteDisciplineWithTeachers(disciplineId: string): Promise<void> {
+    await this.disciplinesTeachersService.deleteAllDisciplineTeachers(
+      disciplineId,
+    );
+
+    await this.deleteDiscipline(disciplineId);
   }
 
   async getStudentsWithDiscipline(disciplineId) {

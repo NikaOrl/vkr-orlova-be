@@ -1,10 +1,20 @@
-import { Body, Controller, Get, Param, Put, Res } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Put,
+  Res,
+} from '@nestjs/common';
 
 import { DisciplinesService } from './disciplines.service';
 
 import { Response } from 'express';
 import { ResultStatus } from '../../common/types/ResultStatus';
 import { UpdateDisciplineWithTeachersDto } from './dto/update-discipline-with-teachers.dto';
+import { CreateDisciplineWithTeachersDto } from './dto/create-discipline-with-teachers.dto';
 
 @Controller('disciplines')
 export class DisciplinesController {
@@ -13,6 +23,19 @@ export class DisciplinesController {
   @Get()
   async getDisciplinesWithTeachers() {
     return this.disciplinesService.getDisciplinesWithTeachers();
+  }
+
+  @Post()
+  async createDisciplineWithTeachers(
+    @Body() createDisciplineWithTeachersDto: CreateDisciplineWithTeachersDto,
+  ): Promise<ResultStatus> {
+    await this.disciplinesService.createDisciplineWithTeachers(
+      createDisciplineWithTeachersDto,
+    );
+
+    return {
+      status: 'success',
+    };
   }
 
   @Put(':disciplineId')
@@ -24,6 +47,17 @@ export class DisciplinesController {
       disciplineId,
       updateDisciplineWithTeachersDto,
     );
+
+    return {
+      status: 'success',
+    };
+  }
+
+  @Delete(':disciplineId')
+  async deleteDisciplineWithTeachers(
+    @Param('disciplineId') disciplineId: string,
+  ): Promise<ResultStatus> {
+    await this.disciplinesService.deleteDisciplineWithTeachers(disciplineId);
 
     return {
       status: 'success',

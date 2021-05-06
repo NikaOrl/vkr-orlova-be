@@ -10,7 +10,7 @@ import { AttendanceMarksDB } from '../attendances/attendances.interface';
 import { StudentDisciplineDB } from '../students/students.interface';
 import { JobDB } from '../jobs/jobs.interface';
 import { ModuleDB } from '../modules/modules.interface';
-import { DisciplinesDB } from '../disciplines/disciplines.interface';
+import { DisciplinesService } from '../disciplines/disciplines.service';
 
 export interface IJobsWithMarks extends JobDB {
   marks: MarkDB[];
@@ -21,6 +21,7 @@ export class MarksService {
   constructor(
     private readonly knexService: KnexService,
     private readonly jobsService: JobsService,
+    private readonly disciplinesService: DisciplinesService,
   ) {}
 
   async getMarks(disciplineId: string, groupId: string): Promise<any> {
@@ -90,15 +91,9 @@ export class MarksService {
       .whereIn('id', moduleIds)
       .andWhere('deleted', false);
 
-    const [discipline] = await knex<DisciplinesDB>('disciplines')
-      .select([
-        'attendanceWeight',
-        'countWithAttendance',
-        'three',
-        'four',
-        'five',
-      ])
-      .where('id', disciplineId);
+    const discipline = await this.disciplinesService.getDiscipline(
+      disciplineId,
+    );
 
     const resultJobs = jobs.map((job) => {
       const jobMarks = R.filter(R.propEq('jobId', job.id))(marks);
