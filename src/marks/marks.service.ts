@@ -4,13 +4,13 @@ import { Injectable } from '@nestjs/common';
 
 import { KnexService } from '../knex/knex.service';
 import { JobsService } from '../jobs/jobs.service';
+import { DisciplinesService } from '../disciplines/disciplines.service';
 
 import { MarkDB } from './marks.interface';
-import { AttendanceMarksDB } from '../attendances/attendances.interface';
-import { StudentDisciplineDB } from '../students/students.interface';
 import { JobDB } from '../jobs/jobs.interface';
 import { ModuleDB } from '../modules/modules.interface';
-import { DisciplinesService } from '../disciplines/disciplines.service';
+import { StudentDisciplineDB } from '../students-disciplines/students-disciplines.interface';
+import { AttendanceMarksDB } from '../attendance-marks/attendanceMarks.interface';
 
 export interface IJobsWithMarks extends JobDB {
   marks: MarkDB[];

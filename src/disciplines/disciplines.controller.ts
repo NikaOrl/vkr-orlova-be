@@ -13,8 +13,10 @@ import { DisciplinesService } from './disciplines.service';
 
 import { Response } from 'express';
 import { ResultStatus } from '../../common/types/ResultStatus';
+
 import { UpdateDisciplineWithTeachersDto } from './dto/update-discipline-with-teachers.dto';
 import { CreateDisciplineWithTeachersDto } from './dto/create-discipline-with-teachers.dto';
+import { GetDisciplineGroupsResultDto } from './dto/get-discipline-groups-result.dto';
 
 @Controller('disciplines')
 export class DisciplinesController {
@@ -90,5 +92,12 @@ export class DisciplinesController {
       console.log(err);
       throw err;
     }
+  }
+
+  @Get(':disciplineId/groups')
+  async getDisciplineGroups(
+    @Param('disciplineId') disciplineId: string,
+  ): Promise<GetDisciplineGroupsResultDto[]> {
+    return this.disciplinesService.getDisciplineGroups(disciplineId);
   }
 }

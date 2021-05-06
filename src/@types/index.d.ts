@@ -4,8 +4,9 @@ import { DisciplinesDB } from '../disciplines/disciplines.interface';
 import { GroupDB } from '../groups/groups.interface';
 import { JobDB } from '../jobs/jobs.interface';
 import { MarkDB } from '../marks/marks.interface';
-import { StudentDB, StudentDisciplineDB } from '../students/students.interface';
+import { StudentDB } from '../students/students.interface';
 import { DisciplineTeacherDB } from '../disciplines-teachers/disciplines-teachers.interface';
+import { StudentDisciplineDB } from '../students-disciplines/students-disciplines.interface';
 
 declare module 'knex/types/tables' {
   interface Tables {

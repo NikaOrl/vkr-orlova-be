@@ -12,9 +12,3 @@ export interface StudentDB {
 }
 
 export type Student = OmitDeleted<StudentDB>;
-
-export interface StudentDisciplineDB {
-  id: string;
-  studentId: string;
-  disciplineId: string;
-}
