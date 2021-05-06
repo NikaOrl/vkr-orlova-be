@@ -28,6 +28,8 @@ import { ModulesModule } from './modules/modules.module';
 import { AttendancesModule } from './attendances/attendances.module';
 import { AttendanceMarksModule } from './attendance-marks/attendance-marks.module';
 import { JobsModule } from './jobs/jobs.module';
+import { DisciplinesTeachersService } from './disciplines-teachers/disciplines-teachers.service';
+import { DisciplinesTeachersModule } from './disciplines-teachers/disciplines-teachers.module';
 
 @Module({
   imports: [
@@ -40,6 +42,7 @@ import { JobsModule } from './jobs/jobs.module';
     AttendancesModule,
     AttendanceMarksModule,
     JobsModule,
+    DisciplinesTeachersModule,
   ],
   controllers: [
     AppController,
@@ -65,6 +68,7 @@ import { JobsModule } from './jobs/jobs.module';
     JobsService,
     MarksService,
     LoginService,
+    DisciplinesTeachersService,
   ],
 })
 export class AppModule implements NestModule {

@@ -5,6 +5,7 @@ knex.schema
   .createTable('groups', (table) => {
     table.uuid('id').primary();
     table.string('groupNumber');
+    table.boolean('deleted').defaultTo(false);
   })
   .then(() => console.log('table groups created'))
   .catch((err) => {

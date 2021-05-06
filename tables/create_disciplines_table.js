@@ -11,6 +11,7 @@ knex.schema
     table.integer('four').defaultTo(20);
     table.integer('five').defaultTo(30);
     table.boolean('countWithAttendance').defaultTo(true);
+    table.boolean('deleted').defaultTo(false);
   })
   .then(() => console.log('table disciplines created'))
   .catch((err) => {
