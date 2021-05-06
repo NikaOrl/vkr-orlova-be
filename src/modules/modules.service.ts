@@ -7,8 +7,9 @@ import { JobsService } from '../jobs/jobs.service';
 
 import { Module, ModuleDB } from './modules.interface';
 import { Job, JobDB } from '../jobs/jobs.interface';
-import { StudentDB, StudentDisciplineDB } from '../students/students.interface';
+import { StudentDB } from '../students/students.interface';
 import { MarkDB } from '../marks/marks.interface';
+import { StudentDisciplineDB } from '../students-disciplines/students-disciplines.interface';
 
 export interface IGetModulesWithJobs extends Module {
   jobs: Array<Job>;

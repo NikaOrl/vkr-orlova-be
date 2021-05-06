@@ -9,13 +9,3 @@ export interface AttendancesDB {
 }
 
 export type Attendances = OmitDeleted<AttendancesDB>;
-
-export interface AttendanceMarksDB {
-  id: string;
-  studentId: string;
-  attendanceId: string;
-  attendanceMarkValue: boolean;
-  deleted: boolean;
-}
-
-export type AttendanceMarks = OmitDeleted<AttendanceMarksDB>;

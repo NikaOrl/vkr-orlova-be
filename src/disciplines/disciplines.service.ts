@@ -4,8 +4,12 @@ import { Injectable } from '@nestjs/common';
 
 import { KnexService } from '../knex/knex.service';
 import { DisciplinesTeachersService } from '../disciplines-teachers/disciplines-teachers.service';
+import { StudentsDisciplinesService } from '../students-disciplines/students-disciplines.service';
+import { StudentsService } from '../students/students.service';
 
+import { GroupDB } from '../groups/groups.interface';
 import { DisciplinesDB } from './disciplines.interface';
+import { GroupsService } from '../groups/groups.service';
 
 export interface IDisciplineWithTeachers extends DisciplinesDB {
   teacherIds: string[];
@@ -21,7 +25,11 @@ export class DisciplinesService {
   constructor(
     private readonly knexService: KnexService,
     private readonly disciplinesTeachersService: DisciplinesTeachersService,
+    private readonly studentsDisciplinesService: StudentsDisciplinesService,
+    private readonly studentsService: StudentsService,
+    private readonly groupsService: GroupsService,
   ) {}
+
   async getDiscipline(id: string): Promise<DisciplinesDB> {
     const knex = this.knexService.getKnex();
 
@@ -328,5 +336,17 @@ export class DisciplinesService {
         .whereIn('studentId', studentIdsToRemoveFromDiscipline)
         .delete();
     }
+  }
+
+  async getDisciplineGroups(disciplineId: string): Promise<GroupDB[]> {
+    const studentIds = await this.studentsDisciplinesService.getStudentIdsByDisciplineId(
+      disciplineId,
+    );
+
+    const students = await this.studentsService.getStudentsById(studentIds);
+
+    const groupIds = R.pipe(R.map(R.prop('groupId')), R.uniq)(students);
+
+    return await this.groupsService.getGroupsByIds(groupIds);
   }
 }

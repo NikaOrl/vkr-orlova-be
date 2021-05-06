@@ -3,10 +3,12 @@ import { v4 as uuid } from 'uuid';
 import { Injectable } from '@nestjs/common';
 
 import { KnexService } from '../knex/knex.service';
-
-import { StudentDB, StudentDisciplineDB } from '../students/students.interface';
-import { AttendanceMarksDB, AttendancesDB } from './attendances.interface';
 import { AttendanceMarksService } from '../attendance-marks/attendance-marks.service';
+
+import { StudentDB } from '../students/students.interface';
+import { AttendancesDB } from './attendances.interface';
+import { StudentDisciplineDB } from '../students-disciplines/students-disciplines.interface';
+import { AttendanceMarksDB } from '../attendance-marks/attendanceMarks.interface';
 
 export interface IAttendancesWithAttendancesMarks extends AttendancesDB {
   attendanceMarks: AttendanceMarksDB[];

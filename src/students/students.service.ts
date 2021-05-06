@@ -3,9 +3,20 @@ import { Injectable } from '@nestjs/common';
 
 import { KnexService } from '../knex/knex.service';
 
+import { StudentDB } from './students.interface';
+
 @Injectable()
 export class StudentsService {
   constructor(private readonly knexService: KnexService) {}
+
+  async getStudentsById(ids: string[]): Promise<StudentDB[]> {
+    const knex = this.knexService.getKnex();
+
+    return knex<StudentDB>('students')
+      .select('*')
+      .whereIn('id', ids)
+      .andWhere('deleted', false);
+  }
 
   async getStudentsByGroup(groupId) {
     const knex = this.knexService.getKnex();

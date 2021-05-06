@@ -30,6 +30,9 @@ import { AttendanceMarksModule } from './attendance-marks/attendance-marks.modul
 import { JobsModule } from './jobs/jobs.module';
 import { DisciplinesTeachersService } from './disciplines-teachers/disciplines-teachers.service';
 import { DisciplinesTeachersModule } from './disciplines-teachers/disciplines-teachers.module';
+import { GroupsModule } from './groups/groups.module';
+import { StudentsDisciplinesModule } from './students-disciplines/students-disciplines.module';
+import { StudentsModule } from './students/students.module';
 
 @Module({
   imports: [
@@ -43,6 +46,9 @@ import { DisciplinesTeachersModule } from './disciplines-teachers/disciplines-te
     AttendanceMarksModule,
     JobsModule,
     DisciplinesTeachersModule,
+    GroupsModule,
+    StudentsDisciplinesModule,
+    StudentsModule,
   ],
   controllers: [
     AppController,

@@ -4,7 +4,7 @@ import { Injectable } from '@nestjs/common';
 
 import { KnexService } from '../knex/knex.service';
 
-import { AttendanceMarksDB } from '../attendances/attendances.interface';
+import { AttendanceMarksDB } from './attendanceMarks.interface';
 
 @Injectable()
 export class AttendanceMarksService {
