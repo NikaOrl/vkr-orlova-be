@@ -3,7 +3,16 @@ import { v4 as uuid } from 'uuid';
 import { Injectable } from '@nestjs/common';
 
 import { KnexService } from '../knex/knex.service';
-import { DisciplinesDB } from './disciplines.interface';
+import { DisciplinesDB, DisciplineTeacherDB } from './disciplines.interface';
+
+export interface IDisciplineWithTeachers extends DisciplinesDB {
+  teacherIds: string[];
+  marksAreas: {
+    five: number;
+    four: number;
+    three: number;
+  };
+}
 
 @Injectable()
 export class DisciplinesService {
@@ -61,15 +70,19 @@ export class DisciplinesService {
     );
   }
 
-  async updateDiscipline(id, data) {
+  async updateDisciplineWithTeachers(
+    id: string,
+    disciplineWithTeachers: IDisciplineWithTeachers,
+  ): Promise<void> {
     const knex = this.knexService.getKnex();
 
-    const currentTeachers = await knex
-      .from('disciplines-teachers')
+    const currentTeachers = await knex<DisciplineTeacherDB>(
+      'disciplines-teachers',
+    )
       .select('teacherId')
       .where('disciplineId', id);
 
-    const updatedTeacherIds = data.teacherIds;
+    const updatedTeacherIds = disciplineWithTeachers.teacherIds;
     const currentTeacherIds = currentTeachers.map(R.prop('teacherId'));
 
     const teacherIdsToAddToDiscipline = R.difference(
@@ -90,11 +103,16 @@ export class DisciplinesService {
       }),
     );
 
-    await knex('disciplines').where('id', id).update({
-      disciplineValue: data.disciplineValue,
-      attendanceWeight: data.attendanceWeight,
-      countWithAttendance: data.countWithAttendance,
-    });
+    const disciplineDataToUpdate = {
+      disciplineValue: disciplineWithTeachers.disciplineValue,
+      attendanceWeight: disciplineWithTeachers.attendanceWeight,
+      countWithAttendance: disciplineWithTeachers.countWithAttendance,
+      ...disciplineWithTeachers.marksAreas,
+    };
+
+    await knex<DisciplinesDB>('disciplines')
+      .where('id', id)
+      .update(disciplineDataToUpdate);
 
     if (!R.isEmpty(teacherIdsToAddToDiscipline)) {
       await knex('disciplines-teachers').insert(teachersWithDisciplineIdToAdd);
