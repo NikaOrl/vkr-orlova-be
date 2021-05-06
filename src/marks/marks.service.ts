@@ -91,7 +91,13 @@ export class MarksService {
       .andWhere('deleted', false);
 
     const [discipline] = await knex<DisciplinesDB>('disciplines')
-      .select(['attendanceWeight', 'countWithAttendance'])
+      .select([
+        'attendanceWeight',
+        'countWithAttendance',
+        'three',
+        'four',
+        'five',
+      ])
       .where('id', disciplineId);
 
     const resultJobs = jobs.map((job) => {
@@ -121,12 +127,23 @@ export class MarksService {
       R.length,
     )(studentAttendanceMarks);
 
-    const { attendanceWeight, countWithAttendance } = discipline;
+    const {
+      attendanceWeight,
+      countWithAttendance,
+      three,
+      four,
+      five,
+    } = discipline;
 
     return {
       maxAttendance,
       attendanceWeight,
       countWithAttendance,
+      marksAreas: {
+        five,
+        four,
+        three,
+      },
       students: resultStudents,
       modules,
       jobs: resultJobs,

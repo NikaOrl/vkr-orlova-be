@@ -1,7 +1,10 @@
 import { Body, Controller, Get, Param, Put, Res } from '@nestjs/common';
 
 import { DisciplinesService } from './disciplines.service';
+
 import { Response } from 'express';
+import { ResultStatus } from '../../common/types/ResultStatus';
+import { UpdateDisciplineWithTeachersDto } from './dto/update-discipline-with-teachers.dto';
 
 @Controller('disciplines')
 export class DisciplinesController {
@@ -13,17 +16,18 @@ export class DisciplinesController {
   }
 
   @Put(':disciplineId')
-  async updateDiscipline(@Res() res: Response, @Param() params, @Body() body) {
-    try {
-      await this.disciplinesService.updateDiscipline(params.disciplineId, body);
+  async updateDisciplineWithTeachers(
+    @Param('disciplineId') disciplineId: string,
+    @Body() updateDisciplineWithTeachersDto: UpdateDisciplineWithTeachersDto,
+  ): Promise<ResultStatus> {
+    await this.disciplinesService.updateDisciplineWithTeachers(
+      disciplineId,
+      updateDisciplineWithTeachersDto,
+    );
 
-      res.status(200).json({
-        status: 'success',
-      });
-    } catch (err) {
-      console.log(err);
-      throw err;
-    }
+    return {
+      status: 'success',
+    };
   }
 
   @Get(':disciplineId/students')

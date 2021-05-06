@@ -4,6 +4,9 @@ export interface DisciplinesDB {
   semesterId: string;
   attendanceWeight: number;
   countWithAttendance: boolean;
+  five: number;
+  four: number;
+  three: number;
 }
 
 export interface DisciplineTeacherDB {
