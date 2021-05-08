@@ -4,6 +4,7 @@ import { Injectable } from '@nestjs/common';
 import { KnexService } from '../knex/knex.service';
 
 import { StudentDB } from './students.interface';
+import { DisciplineTeacherDB } from '../disciplines-teachers/disciplines-teachers.interface';
 
 @Injectable()
 export class StudentsService {
@@ -35,6 +36,17 @@ export class StudentsService {
       id: uuid(),
       ...studentData,
     });
+  }
+
+  async createStudents(students: Omit<StudentDB, 'id'>[]): Promise<void> {
+    const knex = this.knexService.getKnex();
+
+    const studentsToAdd = students.map((student) => ({
+      id: uuid(),
+      ...student,
+    }));
+
+    await knex<DisciplineTeacherDB>('students').insert(studentsToAdd);
   }
 
   async updateStudent(id, data) {
