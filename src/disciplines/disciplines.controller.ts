@@ -17,14 +17,17 @@ import { ResultStatus } from '../../common/types/ResultStatus';
 import { UpdateDisciplineWithTeachersDto } from './dto/update-discipline-with-teachers.dto';
 import { CreateDisciplineWithTeachersDto } from './dto/create-discipline-with-teachers.dto';
 import { GetDisciplineGroupsResultDto } from './dto/get-discipline-groups-result.dto';
+import { GetDisciplinesWithTeachersResultDto } from './dto/get-disciplines-with-teachers-result.dto';
 
 @Controller('disciplines')
 export class DisciplinesController {
   constructor(private disciplinesService: DisciplinesService) {}
 
-  @Get()
-  async getDisciplinesWithTeachers() {
-    return this.disciplinesService.getDisciplinesWithTeachers();
+  @Get(':semesterId')
+  async getDisciplinesWithTeachers(
+    @Param('semesterId') semesterId: string,
+  ): Promise<GetDisciplinesWithTeachersResultDto> {
+    return this.disciplinesService.getDisciplinesWithTeachers(semesterId);
   }
 
   @Post()
