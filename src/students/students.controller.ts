@@ -7,78 +7,65 @@ import {
   Post,
   Put,
   Query,
-  Res,
 } from '@nestjs/common';
-import { Response } from 'express';
 
 import { StudentsService } from './students.service';
 
-import { CreateStudentDto } from './dto/create-student.dto';
+import { ResultStatus } from '../../common/types/ResultStatus';
+import { CreateStudentsDto } from './dto/create-students.dto';
 import { UpdateStudentsDto } from './dto/update-students.dto';
+import { GetStudentsByGroupResultDto } from './dto/get-students-by-group-result.dto';
 
 @Controller('students')
 export class StudentsController {
   constructor(private studentService: StudentsService) {}
 
   @Get(':groupId')
-  async getStudentsByGroup(@Param() params) {
-    return await this.studentService.getStudentsByGroup(params.groupId);
+  async getStudentsByGroup(
+    @Param('groupId') groupId: string,
+  ): Promise<GetStudentsByGroupResultDto> {
+    return await this.studentService.getStudentsByGroup(groupId);
   }
 
   @Post()
-  async addStudent(
-    @Body() studentData: CreateStudentDto,
-    @Res() res: Response,
-  ) {
-    try {
-      await this.studentService.addStudent(studentData);
+  async addStudents(
+    @Body() createStudentsDto: CreateStudentsDto,
+  ): Promise<ResultStatus> {
+    await this.studentService.createStudents(createStudentsDto);
 
-      res.status(200).json({
-        status: 'success',
-      });
-    } catch (err) {
-      console.log(err);
-      throw err;
-    }
+    return {
+      status: 'success',
+    };
   }
 
   @Put()
   async updateStudents(
-    @Body() students: Array<UpdateStudentsDto>,
-    @Res() res: Response,
-  ) {
-    try {
-      const promises = students.map(async (studentData) => {
-        return await this.studentService.updateStudent(
-          studentData.id,
-          studentData,
-        );
-      });
+    @Body() students: UpdateStudentsDto,
+  ): Promise<ResultStatus> {
+    const promises = students.map(async (studentData) => {
+      return await this.studentService.updateStudent(
+        studentData.id,
+        studentData,
+      );
+    });
 
-      await Promise.all(promises);
+    await Promise.all(promises);
 
-      res.status(200).json({
-        status: 'success',
-      });
-    } catch (err) {
-      console.log(err);
-      throw err;
-    }
+    return {
+      status: 'success',
+    };
   }
 
   @Delete()
-  async deleteStudents(@Query() query, @Res() res: Response) {
-    try {
-      const ids = Array.isArray(query.ids) ? query.ids : [query.ids];
+  async deleteStudents(
+    @Query('ids') ids: string | string[],
+  ): Promise<ResultStatus> {
+    const studentIds = Array.isArray(ids) ? ids : [ids];
 
-      await this.studentService.deleteStudents(ids);
+    await this.studentService.deleteStudents(studentIds);
 
-      res.status(200).json({
-        status: 'success',
-      });
-    } catch (err) {
-      console.log(err);
-      throw err;
-    }
+    return {
+      status: 'success',
+    };
   }
 }
