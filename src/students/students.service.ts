@@ -4,7 +4,6 @@ import { Injectable } from '@nestjs/common';
 import { KnexService } from '../knex/knex.service';
 
 import { StudentDB } from './students.interface';
-import { DisciplineTeacherDB } from '../disciplines-teachers/disciplines-teachers.interface';
 
 @Injectable()
 export class StudentsService {
@@ -19,20 +18,19 @@ export class StudentsService {
       .andWhere('deleted', false);
   }
 
-  async getStudentsByGroup(groupId) {
+  async getStudentsByGroup(groupId: string): Promise<StudentDB[]> {
     const knex = this.knexService.getKnex();
 
-    return knex
-      .from('students')
+    return knex<StudentDB>('students')
       .select('*')
       .where('groupId', groupId)
       .andWhere('deleted', false);
   }
 
-  async addStudent(studentData) {
+  async addStudent(studentData: Omit<StudentDB, 'id'>): Promise<void> {
     const knex = this.knexService.getKnex();
 
-    await knex('students').insert({
+    await knex<StudentDB>('students').insert({
       id: uuid(),
       ...studentData,
     });
@@ -46,18 +44,20 @@ export class StudentsService {
       ...student,
     }));
 
-    await knex<DisciplineTeacherDB>('students').insert(studentsToAdd);
+    await knex<StudentDB>('students').insert(studentsToAdd);
   }
 
-  async updateStudent(id, data) {
+  async updateStudent(id: string, studentData: StudentDB): Promise<void> {
     const knex = this.knexService.getKnex();
-    console.log(id, data);
-    await knex('students').where('id', id).update(data);
+
+    await knex<StudentDB>('students').where('id', id).update(studentData);
   }
 
-  async deleteStudents(ids: Array<string>) {
+  async deleteStudents(ids: string[]): Promise<void> {
     const knex = this.knexService.getKnex();
 
-    return knex('students').whereIn('id', ids).update('deleted', true);
+    await knex<StudentDB>('students')
+      .whereIn('id', ids)
+      .update('deleted', true);
   }
 }

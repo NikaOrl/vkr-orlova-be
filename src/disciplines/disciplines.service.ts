@@ -74,7 +74,9 @@ export class DisciplinesService {
       .update('deleted', true);
   }
 
-  async getDisciplinesWithTeachers(): Promise<IDisciplineWithTeachers[]> {
+  async getDisciplinesWithTeachers(
+    semesterId: string,
+  ): Promise<IDisciplineWithTeachers[]> {
     const knex = this.knexService.getKnex();
     // TODO переделать запрос. Если у дисциплины нет учителя
     const disciplinesTeachers = await knex<DisciplinesDB>('disciplines')
@@ -94,7 +96,8 @@ export class DisciplinesService {
         'four',
         'three',
       ])
-      .where('deleted', false);
+      .where('semesterId', semesterId)
+      .andWhere('deleted', false);
 
     return disciplinesTeachers.reduce(
       (acc, { disciplineId, teacherId, ...disciplineWithTeachers }) => {
@@ -117,7 +120,7 @@ export class DisciplinesService {
               disciplineValue: disciplineWithTeachers.disciplineValue,
               attendanceWeight: disciplineWithTeachers.attendanceWeight,
               countWithAttendance: disciplineWithTeachers.countWithAttendance,
-              semesterId: 'semesterId',
+              semesterId: disciplineWithTeachers.semesterId,
               marksAreas: {
                 five: disciplineWithTeachers.five,
                 four: disciplineWithTeachers.four,
@@ -168,7 +171,7 @@ export class DisciplinesService {
       disciplineValue: disciplineWithTeachers.disciplineValue,
       attendanceWeight: disciplineWithTeachers.attendanceWeight,
       countWithAttendance: disciplineWithTeachers.countWithAttendance,
-      semesterId: 'semesterId',
+      semesterId: disciplineWithTeachers.semesterId,
       ...disciplineWithTeachers.marksAreas,
     };
 
@@ -195,7 +198,7 @@ export class DisciplinesService {
       disciplineValue: disciplineWithTeachers.disciplineValue,
       attendanceWeight: disciplineWithTeachers.attendanceWeight,
       countWithAttendance: disciplineWithTeachers.countWithAttendance,
-      semesterId: 'semesterId',
+      semesterId: disciplineWithTeachers.semesterId,
       ...disciplineWithTeachers.marksAreas,
     };
 

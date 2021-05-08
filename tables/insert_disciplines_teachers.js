@@ -37,6 +37,41 @@ const studentsDisciplines = [
     teacherId: '4',
     disciplineId: '3',
   },
+  {
+    id: '8',
+    teacherId: '1',
+    disciplineId: '4',
+  },
+  {
+    id: '9',
+    teacherId: '1',
+    disciplineId: '5',
+  },
+  {
+    id: '10',
+    teacherId: '2',
+    disciplineId: '6',
+  },
+  {
+    id: '11',
+    teacherId: '2',
+    disciplineId: '7',
+  },
+  {
+    id: '12',
+    teacherId: '3',
+    disciplineId: '8',
+  },
+  {
+    id: '13',
+    teacherId: '4',
+    disciplineId: '9',
+  },
+  {
+    id: '14',
+    teacherId: '4',
+    disciplineId: '7',
+  },
 ];
 
 knex('disciplines-teachers')
