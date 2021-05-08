@@ -19,4 +19,12 @@ export class GroupsService {
 
     return knex<GroupDB>('groups').whereIn('id', ids).select('*');
   }
+
+  async getGroupById(id: string): Promise<GroupDB> {
+    const knex = this.knexService.getKnex();
+
+    const [group] = await knex<GroupDB>('groups').where('id', id).select('*');
+
+    return group;
+  }
 }

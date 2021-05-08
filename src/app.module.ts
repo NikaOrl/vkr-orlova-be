@@ -33,6 +33,7 @@ import { DisciplinesTeachersModule } from './disciplines-teachers/disciplines-te
 import { GroupsModule } from './groups/groups.module';
 import { StudentsDisciplinesModule } from './students-disciplines/students-disciplines.module';
 import { StudentsModule } from './students/students.module';
+import { GenerateTableModule } from './generate-table/generate-table.module';
 
 @Module({
   imports: [
@@ -49,6 +50,7 @@ import { StudentsModule } from './students/students.module';
     GroupsModule,
     StudentsDisciplinesModule,
     StudentsModule,
+    GenerateTableModule,
   ],
   controllers: [
     AppController,

@@ -81,4 +81,26 @@ export class StudentsController {
       throw err;
     }
   }
+
+  @Get(':groupId/table')
+  async getStudentsByGroupTable(
+    @Param('groupId') groupId: string,
+    @Res() res: Response,
+  ): Promise<void> {
+    const {
+      stream,
+      groupNumber,
+    } = await this.studentService.getStudentsByGroupTable(groupId);
+
+    res.setHeader(
+      'Content-Type',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    );
+    res.setHeader(
+      'Content-Disposition',
+      `attachment; filename=Students_${groupNumber}.xlsx`,
+    );
+    res.setHeader('Content-Length', stream.length);
+    res.send(stream);
+  }
 }
