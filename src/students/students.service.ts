@@ -10,7 +10,15 @@ import { StudentDB } from './students.interface';
 export class StudentsService {
   constructor(private readonly knexService: KnexService) {}
 
-  async getStudentsById(ids: string[]): Promise<StudentDB[]> {
+  async getAllStudents(): Promise<StudentDB[]> {
+    const knex = this.knexService.getKnex();
+
+    return knex<StudentDB>('students')
+      .select('*')
+      .andWhere('deleted', false);
+  }
+
+  async getStudentsByIds(ids: string[]): Promise<StudentDB[]> {
     const knex = this.knexService.getKnex();
 
     return knex<StudentDB>('students')
@@ -41,8 +49,8 @@ export class StudentsService {
     const knex = this.knexService.getKnex();
 
     const studentsToAdd = students.map((student) => ({
-      id: uuid(),
       ...student,
+      id: uuid(),
     }));
 
     await knex<StudentDB>('students').insert(studentsToAdd);

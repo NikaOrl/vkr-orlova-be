@@ -10,6 +10,7 @@ import { StudentsService } from '../students/students.service';
 import { GroupDB } from '../groups/groups.interface';
 import { DisciplinesDB } from './disciplines.interface';
 import { GroupsService } from '../groups/groups.service';
+import { StudentDB } from '../students/students.interface';
 
 export interface IDisciplineWithTeachers extends DisciplinesDB {
   teacherIds: string[];
@@ -18,6 +19,10 @@ export interface IDisciplineWithTeachers extends DisciplinesDB {
     four: number;
     three: number;
   };
+}
+
+export interface IGroupsWithStudents extends GroupDB {
+  students: StudentDB[];
 }
 
 @Injectable()
@@ -226,26 +231,18 @@ export class DisciplinesService {
     await this.deleteDiscipline(disciplineId);
   }
 
-  async getStudentsWithDiscipline(disciplineId) {
-    const knex = this.knexService.getKnex();
+  async getStudentsWithDiscipline(
+    disciplineId: string,
+  ): Promise<IGroupsWithStudents[]> {
+    const groups = await this.groupsService.getGroups();
 
-    const groups = await knex.from('groups').select('*');
+    const students = await this.studentsService.getAllStudents();
 
-    const students = await knex
-      .from('students')
-      .select(['id', 'firstName', 'lastName', 'groupId']);
-
-    const studentWithDiscipline = await knex
-      .from('students-disciplines')
-      .select('studentId')
-      .where('disciplineId', disciplineId);
-
-    const studentIdsWithDiscipline = R.map(
-      R.prop('studentId'),
-      studentWithDiscipline,
+    const studentIdsWithDiscipline = await this.studentsDisciplinesService.getStudentIdsByDisciplineId(
+      disciplineId,
     );
 
-    const getGroupNumber = (groupId) => {
+    const getGroupNumber = (groupId: string): string => {
       return R.pipe(
         R.find(R.propEq('id', groupId)),
         R.prop('groupNumber'),
@@ -276,16 +273,12 @@ export class DisciplinesService {
     })(groupsWithStudents);
   }
 
-  async updateStudentsWithDiscipline(disciplineId: string, groupsWithStudents) {
-    const knex = this.knexService.getKnex();
-
-    const currentStudentsWithDiscipline = await knex
-      .from('students-disciplines')
-      .select('*')
-      .where('disciplineId', disciplineId);
-
-    const currentStudentsWithDisciplineIds = R.map(R.prop('studentId'))(
-      currentStudentsWithDiscipline,
+  async updateStudentsWithDiscipline(
+    disciplineId: string,
+    groupsWithStudents: IGroupsWithStudents[],
+  ): Promise<void> {
+    const currentStudentsWithDisciplineIds = await this.studentsDisciplinesService.getStudentIdsByDisciplineId(
+      disciplineId,
     );
 
     const students = groupsWithStudents.reduce((acc, group) => {
@@ -323,21 +316,22 @@ export class DisciplinesService {
 
     const studentsWithDisciplineIdToAdd = R.pipe(
       R.map((studentId) => ({
-        id: uuid(),
         studentId,
         disciplineId,
       })),
     )(studentIdsToAddToDiscipline);
 
     if (!R.isEmpty(studentsWithDisciplineIdToAdd)) {
-      await knex('students-disciplines').insert(studentsWithDisciplineIdToAdd);
+      await this.studentsDisciplinesService.addStudentsWithDiscipline(
+        studentsWithDisciplineIdToAdd,
+      );
     }
 
     if (!R.isEmpty(studentIdsToRemoveFromDiscipline)) {
-      await knex('students-disciplines')
-        .where('disciplineId', disciplineId)
-        .whereIn('studentId', studentIdsToRemoveFromDiscipline)
-        .delete();
+      await this.studentsDisciplinesService.deleteStudentsWithDiscipline(
+        disciplineId,
+        studentIdsToRemoveFromDiscipline,
+      );
     }
   }
 
@@ -346,7 +340,7 @@ export class DisciplinesService {
       disciplineId,
     );
 
-    const students = await this.studentsService.getStudentsById(studentIds);
+    const students = await this.studentsService.getStudentsByIds(studentIds);
 
     const groupIds = R.pipe(R.map(R.prop('groupId')), R.uniq)(students);
 
