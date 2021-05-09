@@ -1,3 +1,3 @@
-import { IUpdateModulesWithJobs } from '../modules.service';
+import { IModulesWithJobs } from '../modules.service';
 
-export type UpdateModulesWithJobsDto = IUpdateModulesWithJobs;
+export type UpdateModulesWithJobsDto = IModulesWithJobs;
