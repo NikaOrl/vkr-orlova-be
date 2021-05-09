@@ -1,8 +1,9 @@
+import * as R from 'ramda';
 import { v4 as uuid } from 'uuid';
 import { Injectable } from '@nestjs/common';
+
 import { KnexService } from '../knex/knex.service';
 
-import { ForcefullyOmit } from '../../common/types/forcefully-omit';
 import { Teacher, TeacherDB } from './teachers.interface';
 
 const bcrypt = require('bcryptjs');
@@ -17,7 +18,7 @@ export class TeachersService {
     return knex<Teacher>('teachers').where({ email }).first();
   }
 
-  async getAll(): Promise<ForcefullyOmit<Teacher, 'password'>[]> {
+  async getAll(): Promise<Omit<Teacher, 'password'>[]> {
     const knex = this.knexService.getKnex();
 
     return knex
@@ -26,50 +27,57 @@ export class TeachersService {
       .andWhere('deleted', false);
   }
 
-  async updateTeacher(id, data) {
-    const knex = this.knexService.getKnex();
-
-    try {
-      const salt = bcrypt.genSaltSync();
-      const passwordHash = bcrypt.hashSync(data.password, salt);
-
-      const teachersData = {
-        ...data,
-        password: passwordHash,
-      };
-
-      const result = await knex('teachers')
-        .where('id', id)
-        .update(teachersData);
-
-      if (result) {
-        console.log(`teacher was updated`);
-      }
-    } catch (err) {
-      console.log(err);
-      throw err;
-    }
-  }
-
-  async deleteTeachers(ids: Array<string>) {
-    const knex = this.knexService.getKnex();
-
-    return knex('teachers').whereIn('id', ids).update('deleted', true);
-  }
-
-  async createTeachers(teacherData) {
+  async updateTeacher(id: string, teacherData: TeacherDB): Promise<void> {
     const knex = this.knexService.getKnex();
 
     const salt = bcrypt.genSaltSync();
     const passwordHash = bcrypt.hashSync(teacherData.password, salt);
 
-    return knex('teachers').insert({
-      id: uuid(),
+    const teachersData = {
+      ...teacherData,
+      password: passwordHash,
+    };
+
+    await knex('teachers').where('id', id).update(teachersData);
+  }
+
+  async deleteTeacher(id: string): Promise<void> {
+    const knex = this.knexService.getKnex();
+
+    await knex<TeacherDB>('teachers').where('id', id).update('deleted', true);
+  }
+
+  async createTeacher(teacherData: Omit<TeacherDB, 'id'>): Promise<string> {
+    const knex = this.knexService.getKnex();
+
+    const salt = bcrypt.genSaltSync();
+    const passwordHash = bcrypt.hashSync(teacherData.password, salt);
+
+    const id = uuid();
+
+    await knex('teachers').insert({
+      id,
       email: teacherData.email,
       password: passwordHash,
       firstName: teacherData.firstName,
       lastName: teacherData.lastName,
       isAdmin: teacherData.isAdmin,
     });
+
+    return id;
+  }
+
+  async teacherCDU(teacherData: TeacherDB): Promise<string | void> {
+    if (teacherData.deleted) {
+      return await this.deleteTeacher(teacherData.id);
+    }
+
+    if (!teacherData.id || Number(teacherData.id) < 0) {
+      const newAttendanceData = R.omit(['id'])(teacherData);
+
+      return await this.createTeacher(newAttendanceData);
+    }
+
+    return await this.updateTeacher(teacherData.id, teacherData);
   }
 }

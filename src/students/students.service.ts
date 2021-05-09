@@ -27,7 +27,13 @@ export class StudentsService {
     private readonly groupsService: GroupsService,
   ) {}
 
-  async getStudentsById(ids: string[]): Promise<StudentDB[]> {
+  async getAllStudents(): Promise<StudentDB[]> {
+    const knex = this.knexService.getKnex();
+
+    return knex<StudentDB>('students').select('*').andWhere('deleted', false);
+  }
+
+  async getStudentsByIds(ids: string[]): Promise<StudentDB[]> {
     const knex = this.knexService.getKnex();
 
     return knex<StudentDB>('students')
@@ -39,32 +45,56 @@ export class StudentsService {
   async getStudentsByGroup(groupId: string): Promise<StudentDB[]> {
     const knex = this.knexService.getKnex();
 
-    return knex
-      .from('students')
+    return knex<StudentDB>('students')
       .select('*')
       .where('groupId', groupId)
       .andWhere('deleted', false);
   }
 
-  async addStudent(studentData) {
+  async createStudent(studentData: Omit<StudentDB, 'id'>): Promise<void> {
     const knex = this.knexService.getKnex();
 
-    await knex('students').insert({
+    await knex<StudentDB>('students').insert({
       id: uuid(),
       ...studentData,
     });
   }
 
-  async updateStudent(id, data) {
+  async createStudents(students: Omit<StudentDB, 'id'>[]): Promise<void> {
     const knex = this.knexService.getKnex();
-    console.log(id, data);
-    await knex('students').where('id', id).update(data);
+
+    const studentsToAdd = students.map((student) => ({
+      ...student,
+      id: uuid(),
+    }));
+
+    await knex<StudentDB>('students').insert(studentsToAdd);
   }
 
-  async deleteStudents(ids: Array<string>) {
+  async updateStudent(id: string, studentData: StudentDB): Promise<void> {
     const knex = this.knexService.getKnex();
 
-    return knex('students').whereIn('id', ids).update('deleted', true);
+    await knex<StudentDB>('students').where('id', id).update(studentData);
+  }
+
+  async deleteStudent(id: string): Promise<void> {
+    const knex = this.knexService.getKnex();
+
+    await knex<StudentDB>('students').where('id', id).update('deleted', true);
+  }
+
+  async studentCDU(studentData: StudentDB): Promise<string | void> {
+    if (studentData.deleted) {
+      return await this.deleteStudent(studentData.id);
+    }
+
+    if (!studentData.id || Number(studentData.id) < 0) {
+      const newStudentData = R.omit(['id'])(studentData);
+
+      return await this.createStudent(newStudentData);
+    }
+
+    return await this.updateStudent(studentData.id, studentData);
   }
 
   async getStudentsByGroupTable(

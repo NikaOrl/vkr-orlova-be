@@ -1,5 +1,3 @@
-export interface UpdateStudentsWithDisciplineDto {
-  groupId: number;
-  groupNumber: number;
-  students: Array<any>;
-}
+import { IGroupsWithStudents } from '../disciplines.service';
+
+export type UpdateStudentsWithDisciplineDto = IGroupsWithStudents[];

@@ -6,25 +6,28 @@ import {
   Param,
   Post,
   Put,
-  Res,
 } from '@nestjs/common';
 
 import { DisciplinesService } from './disciplines.service';
 
-import { Response } from 'express';
 import { ResultStatus } from '../../common/types/ResultStatus';
 
 import { UpdateDisciplineWithTeachersDto } from './dto/update-discipline-with-teachers.dto';
 import { CreateDisciplineWithTeachersDto } from './dto/create-discipline-with-teachers.dto';
 import { GetDisciplineGroupsResultDto } from './dto/get-discipline-groups-result.dto';
+import { GetDisciplinesWithTeachersResultDto } from './dto/get-disciplines-with-teachers-result.dto';
+import { UpdateStudentsWithDisciplineDto } from './dto/update-students-with-discipline.dto';
+import { GetStudentsWithDisciplineResultDto } from './dto/get-students-with-discipline-result.dto';
 
 @Controller('disciplines')
 export class DisciplinesController {
   constructor(private disciplinesService: DisciplinesService) {}
 
-  @Get()
-  async getDisciplinesWithTeachers() {
-    return this.disciplinesService.getDisciplinesWithTeachers();
+  @Get(':semesterId')
+  async getDisciplinesWithTeachers(
+    @Param('semesterId') semesterId: string,
+  ): Promise<GetDisciplinesWithTeachersResultDto> {
+    return this.disciplinesService.getDisciplinesWithTeachers(semesterId);
   }
 
   @Post()
@@ -67,31 +70,25 @@ export class DisciplinesController {
   }
 
   @Get(':disciplineId/students')
-  async getStudentsWithDiscipline(@Param() params) {
-    return this.disciplinesService.getStudentsWithDiscipline(
-      params.disciplineId,
-    );
+  async getStudentsWithDiscipline(
+    @Param('disciplineId') disciplineId: string,
+  ): Promise<GetStudentsWithDisciplineResultDto> {
+    return this.disciplinesService.getStudentsWithDiscipline(disciplineId);
   }
 
   @Put(':disciplineId/students')
   async updateStudentsWithDiscipline(
-    @Param() params,
-    @Body() body,
-    @Res() res: Response,
-  ) {
-    try {
-      await this.disciplinesService.updateStudentsWithDiscipline(
-        params.disciplineId,
-        body,
-      );
+    @Param('disciplineId') disciplineId: string,
+    @Body() updateStudentsWithDisciplineDto: UpdateStudentsWithDisciplineDto,
+  ): Promise<ResultStatus> {
+    await this.disciplinesService.updateStudentsWithDiscipline(
+      disciplineId,
+      updateStudentsWithDisciplineDto,
+    );
 
-      res.status(200).json({
-        status: 'success',
-      });
-    } catch (err) {
-      console.log(err);
-      throw err;
-    }
+    return {
+      status: 'success',
+    };
   }
 
   @Get(':disciplineId/groups')
