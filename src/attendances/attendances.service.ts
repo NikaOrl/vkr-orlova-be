@@ -21,7 +21,10 @@ export class AttendancesService {
     private readonly attendanceMarksService: AttendanceMarksService,
   ) {}
 
-  async getAttendances(disciplineId: string, groupId: string): Promise<any> {
+  async getAttendancesAndStudents(
+    disciplineId: string,
+    groupId: string,
+  ): Promise<any> {
     const knex = this.knexService.getKnex();
 
     const students = await knex<StudentDisciplineDB>('students-disciplines')

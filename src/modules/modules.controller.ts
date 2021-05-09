@@ -4,6 +4,7 @@ import { ModulesService } from './modules.service';
 
 import { ResultStatus } from '../../common/types/ResultStatus';
 import { UpdateModulesWithJobsDto } from './dto/update-modules-with-jobs.dto';
+import { GetModulesWithJobsResultDto } from './dto/get-modules-with-jobs-result.dto';
 
 @Controller('modules')
 export class ModulesController {
@@ -13,7 +14,7 @@ export class ModulesController {
   async getModulesWithJobs(
     @Query('disciplineId') disciplineId: string,
     @Query('groupId') groupId: string,
-  ): Promise<any> {
+  ): Promise<GetModulesWithJobsResultDto> {
     return this.modulesService.getModulesWithJobs(disciplineId, groupId);
   }
 

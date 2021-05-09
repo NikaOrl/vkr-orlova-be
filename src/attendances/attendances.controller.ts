@@ -14,7 +14,10 @@ export class AttendancesController {
     @Query('disciplineId') disciplineId: string,
     @Query('groupId') groupId: string,
   ): Promise<any> {
-    return this.attendancesService.getAttendances(disciplineId, groupId);
+    return this.attendancesService.getAttendancesAndStudents(
+      disciplineId,
+      groupId,
+    );
   }
 
   @Put()
