@@ -1,3 +1,4 @@
+import * as R from 'ramda';
 import { v4 as uuid } from 'uuid';
 import { Injectable } from '@nestjs/common';
 
@@ -27,7 +28,7 @@ export class StudentsService {
       .andWhere('deleted', false);
   }
 
-  async addStudent(studentData: Omit<StudentDB, 'id'>): Promise<void> {
+  async createStudent(studentData: Omit<StudentDB, 'id'>): Promise<void> {
     const knex = this.knexService.getKnex();
 
     await knex<StudentDB>('students').insert({
@@ -53,11 +54,23 @@ export class StudentsService {
     await knex<StudentDB>('students').where('id', id).update(studentData);
   }
 
-  async deleteStudents(ids: string[]): Promise<void> {
+  async deleteStudent(id: string): Promise<void> {
     const knex = this.knexService.getKnex();
 
-    await knex<StudentDB>('students')
-      .whereIn('id', ids)
-      .update('deleted', true);
+    await knex<StudentDB>('students').where('id', id).update('deleted', true);
+  }
+
+  async studentCDU(studentData: StudentDB): Promise<string | void> {
+    if (studentData.deleted) {
+      return await this.deleteStudent(studentData.id);
+    }
+
+    if (!studentData.id || Number(studentData.id) < 0) {
+      const newStudentData = R.omit(['id'])(studentData);
+
+      return await this.createStudent(newStudentData);
+    }
+
+    return await this.updateStudent(studentData.id, studentData);
   }
 }

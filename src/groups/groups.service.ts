@@ -31,12 +31,19 @@ export class GroupsService {
     return knex<GroupDB>('groups').whereIn('id', ids).select('*');
   }
 
-  async getGroupById(id: string): Promise<GroupDB> {
+  async getGroupWithStudents(groupId: string): Promise<IGroupWithStudents> {
     const knex = this.knexService.getKnex();
-    console.log(id);
-    const [group] = await knex<GroupDB>('groups').where('id', id).select('*');
 
-    return group;
+    const [group] = await knex<GroupDB>('groups')
+      .where('id', groupId)
+      .select('*');
+
+    const students = await this.studentsService.getStudentsByGroup(groupId);
+
+    return {
+      ...group,
+      students,
+    };
   }
 
   async updateGroup(id: string, groupData: GroupDB): Promise<void> {
@@ -71,5 +78,30 @@ export class GroupsService {
     )(groupWithStudents);
 
     await this.studentsService.createStudents(studentsToCreate);
+  }
+
+  async updateGroupWithStudents(
+    groupId: string,
+    groupWithStudents: IGroupWithStudents,
+  ): Promise<void> {
+    const groupData = R.omit(['students'])(groupWithStudents);
+
+    await this.updateGroup(groupId, groupData);
+
+    const students = R.pipe(
+      R.prop('students'),
+      R.map((student: StudentDB) => {
+        return {
+          ...student,
+          groupId,
+        };
+      }),
+    )(groupWithStudents);
+
+    await Promise.all(
+      students.map(async (student) => {
+        await this.studentsService.studentCDU(student);
+      }),
+    );
   }
 }

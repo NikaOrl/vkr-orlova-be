@@ -4,8 +4,8 @@ import { GroupsService } from './groups.service';
 
 import { GroupDB } from './groups.interface';
 import { ResultStatus } from '../../common/types/ResultStatus';
-import { UpdateGroupDto } from './dto/update-group.dto';
 import { CreateGroupWithStudentsDto } from './dto/create-group-with-students.dto';
+import { UpdateGroupWithStudentsDto } from './dto/update-group-with-students.dto';
 
 @Controller('groups')
 export class GroupsController {
@@ -17,8 +17,10 @@ export class GroupsController {
   }
 
   @Get(':groupId')
-  async getGroupById(@Param('groupId') groupId: string): Promise<GroupDB> {
-    return this.groupsService.getGroupById(groupId);
+  async getGroupWithStudents(
+    @Param('groupId') groupId: string,
+  ): Promise<GroupDB> {
+    return this.groupsService.getGroupWithStudents(groupId);
   }
 
   @Post()
@@ -36,12 +38,15 @@ export class GroupsController {
   }
 
   @Put(':groupId')
-  async updateGroup(
+  async updateGroupWithStudents(
     @Param('groupId') groupId: string,
     @Body()
-    updateGroupDto: UpdateGroupDto,
+    updateGroupWithStudentsDto: UpdateGroupWithStudentsDto,
   ): Promise<ResultStatus> {
-    await this.groupsService.updateGroup(groupId, updateGroupDto);
+    await this.groupsService.updateGroupWithStudents(
+      groupId,
+      updateGroupWithStudentsDto,
+    );
 
     return {
       status: 'success',
