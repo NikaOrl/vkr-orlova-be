@@ -1,8 +1,3 @@
-export interface PutTeachersDto {
-  firstName: string;
-  lastName: string;
-  id: string;
-  email: string;
-  isAdmin: boolean;
-  password: string;
-}
+import { TeacherDB } from '../teachers.interface';
+
+export type PutTeachersDto = TeacherDB[];
