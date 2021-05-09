@@ -1,12 +1,11 @@
 import * as R from 'ramda';
 import { v4 as uuid } from 'uuid';
 import { Injectable } from '@nestjs/common';
+import bcrypt from 'bcryptjs';
 
 import { KnexService } from '../knex/knex.service';
 
 import { Teacher, TeacherDB } from './teachers.interface';
-
-const bcrypt = require('bcryptjs');
 
 @Injectable()
 export class TeachersService {
