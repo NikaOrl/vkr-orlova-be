@@ -13,9 +13,7 @@ export class StudentsService {
   async getAllStudents(): Promise<StudentDB[]> {
     const knex = this.knexService.getKnex();
 
-    return knex<StudentDB>('students')
-      .select('*')
-      .andWhere('deleted', false);
+    return knex<StudentDB>('students').select('*').andWhere('deleted', false);
   }
 
   async getStudentsByIds(ids: string[]): Promise<StudentDB[]> {
