@@ -1,5 +1,15 @@
-import { Body, Controller, Get, Param, Post, Put, Res } from '@nestjs/common';
-import { Response } from 'express';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Put,
+  Res,
+  UploadedFile,
+  UseInterceptors,
+} from '@nestjs/common';
+import { Express, Response } from 'express';
 
 import { GroupsService } from './groups.service';
 
@@ -7,6 +17,7 @@ import { GroupDB } from './groups.interface';
 import { ResultStatus } from '../../common/types/ResultStatus';
 import { CreateGroupWithStudentsDto } from './dto/create-group-with-students.dto';
 import { UpdateGroupWithStudentsDto } from './dto/update-group-with-students.dto';
+import { AnyFilesInterceptor, FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('groups')
 export class GroupsController {
@@ -74,5 +85,11 @@ export class GroupsController {
     );
     res.setHeader('Content-Length', stream.length);
     res.send(stream);
+  }
+
+  @Post(':groupId/table')
+  @UseInterceptors(AnyFilesInterceptor())
+  uploadFile(@UploadedFile() file: Express.Multer.File) {
+    console.log(file);
   }
 }
