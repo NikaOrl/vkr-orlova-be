@@ -1,7 +1,6 @@
 import * as moment from 'moment';
-
-const bcrypt = require('bcryptjs');
-const jwt = require('jwt-simple');
+import bcrypt from 'bcryptjs';
+import jwt from 'jwt-simple';
 
 import TOKEN_SECRET from '../../env/token';
 
