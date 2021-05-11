@@ -10,5 +10,6 @@ import { JobsModule } from '../jobs/jobs.module';
   imports: [KnexModule.register(knexConfig), JobsModule],
   controllers: [ModulesController],
   providers: [ModulesService],
+  exports: [ModulesService],
 })
 export class ModulesModule {}

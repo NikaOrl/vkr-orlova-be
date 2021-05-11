@@ -34,6 +34,7 @@ import { GroupsModule } from './groups/groups.module';
 import { StudentsDisciplinesModule } from './students-disciplines/students-disciplines.module';
 import { StudentsModule } from './students/students.module';
 import { SemestersModule } from './semesters/semesters.module';
+import { LoginModule } from './login/login.module';
 
 @Module({
   imports: [
@@ -51,6 +52,7 @@ import { SemestersModule } from './semesters/semesters.module';
     StudentsDisciplinesModule,
     StudentsModule,
     SemestersModule,
+    LoginModule,
   ],
   controllers: [
     AppController,
