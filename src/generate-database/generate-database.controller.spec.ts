@@ -9,7 +9,9 @@ describe('GenerateDatabaseController', () => {
       controllers: [GenerateDatabaseController],
     }).compile();
 
-    controller = module.get<GenerateDatabaseController>(GenerateDatabaseController);
+    controller = module.get<GenerateDatabaseController>(
+      GenerateDatabaseController,
+    );
   });
 
   it('should be defined', () => {
