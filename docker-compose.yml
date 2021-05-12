@@ -21,7 +21,7 @@ services:
       MYSQL_ROOT_PASSWORD: 'password'
 
   backend:
-    build: ./
+    image: nikaorl/vkr-orlova-be:latest
     container_name: backend
     environment:
       - SECRET_TOKEN=prod-secret-token
