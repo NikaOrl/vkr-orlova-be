@@ -23,6 +23,8 @@ services:
   backend:
     build: ./
     container_name: backend
+    environment:
+      - SECRET_TOKEN=prod-secret-token
     networks:
       - app-network
     ports:

@@ -1,4 +1,6 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
+
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { DisciplinesController } from './disciplines/disciplines.controller';
@@ -40,6 +42,7 @@ import { GenerateDatabaseModule } from './generate-database/generate-database.mo
 
 @Module({
   imports: [
+    ConfigModule.forRoot(),
     KnexModule.register(knexConfig),
     AuthModule,
     TeachersModule,

@@ -3,7 +3,6 @@ import { AuthService } from './auth.service';
 import { TeachersModule } from '../teachers/teachers.module';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
-import TOKEN_SECRET from '../../env/token';
 
 describe('AuthService', () => {
   let service: AuthService;
@@ -14,7 +13,7 @@ describe('AuthService', () => {
         TeachersModule,
         PassportModule,
         JwtModule.register({
-          secret: TOKEN_SECRET,
+          secret: process.env.SECRET_TOKEN,
           signOptions: { expiresIn: '60s' },
         }),
       ],
