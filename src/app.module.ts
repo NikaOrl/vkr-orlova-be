@@ -33,6 +33,7 @@ import { DisciplinesTeachersModule } from './disciplines-teachers/disciplines-te
 import { GroupsModule } from './groups/groups.module';
 import { StudentsDisciplinesModule } from './students-disciplines/students-disciplines.module';
 import { StudentsModule } from './students/students.module';
+import { GenerateTableModule } from './generate-table/generate-table.module';
 import { SemestersModule } from './semesters/semesters.module';
 import { LoginModule } from './login/login.module';
 
@@ -53,6 +54,7 @@ import { LoginModule } from './login/login.module';
     StudentsModule,
     SemestersModule,
     LoginModule,
+    GenerateTableModule,
   ],
   controllers: [
     AppController,

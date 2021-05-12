@@ -1,4 +1,4 @@
-const bcrypt = require('bcryptjs');
+import bcrypt from 'bcryptjs';
 
 const options = require('../env/db.config');
 const knex = require('knex')(options);
