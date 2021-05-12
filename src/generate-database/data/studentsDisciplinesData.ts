@@ -1,7 +1,4 @@
-const options = require('../env/db.config');
-const knex = require('knex')(options);
-
-const studentsDisciplines = [
+export const studentsDisciplines = [
   {
     id: '1',
     studentId: '1',
@@ -273,14 +270,3 @@ const studentsDisciplines = [
     disciplineId: '3',
   },
 ];
-
-knex('students-disciplines')
-  .insert(studentsDisciplines)
-  .then(() => console.log('students-disciplines inserted'))
-  .catch((err) => {
-    console.log(err);
-    throw err;
-  })
-  .finally(() => {
-    knex.destroy();
-  });

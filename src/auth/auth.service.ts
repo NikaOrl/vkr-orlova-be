@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-
-const bcrypt = require('bcryptjs');
+import bcrypt from 'bcryptjs';
 
 import { TeachersService } from '../teachers/teachers.service';
 
