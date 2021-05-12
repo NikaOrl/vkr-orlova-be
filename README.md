@@ -47,9 +47,9 @@ $ npm run start:prod
 
 ## Running DB
 
-1. Set your local DB according to `env/db.config`
-2. Run `npm tables:create` to create all the necessary tables
-3. Run `npm tables:insert` to insert tables with start data
+1. Start app
+2. Run `GET /generate-database/create` to create all the necessary tables
+3. Run `GET /generate-database/insert` to insert tables with start data
 
 ## Test
 

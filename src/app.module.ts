@@ -35,6 +35,7 @@ import { StudentsDisciplinesModule } from './students-disciplines/students-disci
 import { StudentsModule } from './students/students.module';
 import { GenerateTableModule } from './generate-table/generate-table.module';
 import { SemestersModule } from './semesters/semesters.module';
+import { GenerateDatabaseModule } from './generate-database/generate-database.module';
 
 @Module({
   imports: [
@@ -53,6 +54,7 @@ import { SemestersModule } from './semesters/semesters.module';
     StudentsModule,
     SemestersModule,
     GenerateTableModule,
+    GenerateDatabaseModule,
   ],
   controllers: [
     AppController,

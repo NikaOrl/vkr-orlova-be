@@ -10,9 +10,11 @@ import { StudentsService } from '../students/students.service';
 import { GenerateTableService } from '../generate-table/generate-table.service';
 
 const TableColumns = {
+  NUMBER_IN_LIST: 'numberInList',
   FIRST_NAME: 'firstName',
   LAST_NAME: 'lastName',
   EMAIL: 'email',
+  HEAD_STUDENT: 'headStudent',
 };
 
 export interface IStudentsGroupTable {
@@ -128,18 +130,24 @@ export class GroupsService {
 
   async getStudentsByGroupTable(groupId: string): Promise<IStudentsGroupTable> {
     const headers = [
+      { header: 'Номер в списке', key: TableColumns.NUMBER_IN_LIST, width: 10 },
       { header: 'Имя', key: TableColumns.FIRST_NAME, width: 50 },
       { header: 'Фамилия', key: TableColumns.LAST_NAME, width: 50 },
       { header: 'Email', key: TableColumns.EMAIL, width: 50 },
+      { header: 'Староста', key: TableColumns.HEAD_STUDENT, width: 5 },
     ];
 
     const students = await this.studentsService.getStudentsByGroup(groupId);
 
-    const studentsForTable = R.map(({ firstName, lastName, email }) => ({
-      [TableColumns.FIRST_NAME]: firstName,
-      [TableColumns.LAST_NAME]: lastName,
-      [TableColumns.EMAIL]: email,
-    }))(students);
+    const studentsForTable = R.map(
+      ({ firstName, lastName, email, numberInList, headStudent }) => ({
+        [TableColumns.NUMBER_IN_LIST]: numberInList,
+        [TableColumns.FIRST_NAME]: firstName,
+        [TableColumns.LAST_NAME]: lastName,
+        [TableColumns.EMAIL]: email,
+        [TableColumns.HEAD_STUDENT]: headStudent,
+      }),
+    )(students);
 
     const group = await this.getGroupById(groupId);
 

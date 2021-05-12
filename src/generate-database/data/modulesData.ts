@@ -1,7 +1,4 @@
-const options = require('../env/db.config');
-const knex = require('knex')(options);
-
-const modules = [
+export const modules = [
   {
     id: '1',
     moduleName: 'Модуль 1',
@@ -28,14 +25,3 @@ const modules = [
     numberInList: 5,
   },
 ];
-
-knex('modules')
-  .insert(modules)
-  .then(() => console.log('groups inserted'))
-  .catch((err) => {
-    console.log(err);
-    throw err;
-  })
-  .finally(() => {
-    knex.destroy();
-  });
