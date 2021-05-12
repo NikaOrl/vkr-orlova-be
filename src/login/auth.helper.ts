@@ -2,19 +2,17 @@ import * as moment from 'moment';
 import bcrypt from 'bcryptjs';
 import jwt from 'jwt-simple';
 
-import TOKEN_SECRET from '../../env/token';
-
 export const encodeToken = (user) => {
   const playload = {
     exp: moment().add(14, 'days').unix(),
     iat: moment().unix(),
     sub: user,
   };
-  return jwt.encode(playload, TOKEN_SECRET);
+  return jwt.encode(playload, process.env.SECRET_TOKEN);
 };
 
 export const decodeToken = (token, callback) => {
-  const payload = jwt.decode(token, TOKEN_SECRET);
+  const payload = jwt.decode(token, process.env.SECRET_TOKEN);
   const now = moment().unix();
   // check if the token has expired
   if (now > payload.exp) callback('Token has expired.');

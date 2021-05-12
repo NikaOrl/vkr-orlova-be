@@ -1,4 +1,4 @@
-export const disciplines = [
+export const semesters = [
   {
     id: '1',
     semesterName: 'весна 2020',
