@@ -1,13 +1,11 @@
-import bcrypt from 'bcryptjs';
-
-const options = require('../env/db.config');
-const knex = require('knex')(options);
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const bcrypt = require('bcryptjs');
 
 const salt = bcrypt.genSaltSync();
 
 const DEFAULT_PASSWORD = '123';
 
-const teachers = [
+export const teachers = [
   {
     id: '1',
     firstName: 'Иван',
@@ -41,14 +39,3 @@ const teachers = [
     isAdmin: false,
   },
 ];
-
-knex('teachers')
-  .insert(teachers)
-  .then(() => console.log('teachers inserted'))
-  .catch((err) => {
-    console.log(err);
-    throw err;
-  })
-  .finally(() => {
-    knex.destroy();
-  });

@@ -1,4 +1,6 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
+
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { DisciplinesController } from './disciplines/disciplines.controller';
@@ -35,9 +37,12 @@ import { StudentsDisciplinesModule } from './students-disciplines/students-disci
 import { StudentsModule } from './students/students.module';
 import { GenerateTableModule } from './generate-table/generate-table.module';
 import { SemestersModule } from './semesters/semesters.module';
+import { LoginModule } from './login/login.module';
+import { GenerateDatabaseModule } from './generate-database/generate-database.module';
 
 @Module({
   imports: [
+    ConfigModule.forRoot(),
     KnexModule.register(knexConfig),
     AuthModule,
     TeachersModule,
@@ -52,7 +57,9 @@ import { SemestersModule } from './semesters/semesters.module';
     StudentsDisciplinesModule,
     StudentsModule,
     SemestersModule,
+    LoginModule,
     GenerateTableModule,
+    GenerateDatabaseModule,
   ],
   controllers: [
     AppController,

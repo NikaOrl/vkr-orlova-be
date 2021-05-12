@@ -6,7 +6,7 @@ export interface JobDB {
   moduleId: string;
   numberInList: number;
   jobValue: string;
-  maxPoint: string;
+  maxPoint: number;
   deleted: boolean;
 }
 

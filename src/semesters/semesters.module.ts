@@ -10,5 +10,6 @@ import knexConfig from '../knex/knex.config';
   imports: [KnexModule.register(knexConfig)],
   providers: [SemestersService],
   controllers: [SemestersController],
+  exports: [SemestersService],
 })
 export class SemestersModule {}

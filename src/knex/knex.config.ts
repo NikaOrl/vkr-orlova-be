@@ -3,7 +3,7 @@ import { KnexOptions } from './knex-options.interface';
 const config: KnexOptions = {
   client: 'mysql2',
   connection: {
-    host: '127.0.0.1',
+    host: 'db',
     user: 'user',
     password: 'password',
     database: 'db',

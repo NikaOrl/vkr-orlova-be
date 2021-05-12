@@ -9,5 +9,6 @@ import { AttendanceMarksModule } from '../attendance-marks/attendance-marks.modu
   imports: [KnexModule.register(knexConfig), AttendanceMarksModule],
   controllers: [AttendancesController],
   providers: [AttendancesService],
+  exports: [AttendancesService],
 })
 export class AttendancesModule {}
