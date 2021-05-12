@@ -1,12 +1,19 @@
 version: '3'
-services:
 
+networks:
+  app-network:
+    driver: bridge
+
+services:
   db:
     image: mysql:8.0.23
+    container_name: db
     restart: always
     command: --default-authentication-plugin=mysql_native_password
+    networks:
+      - app-network
     ports:
-      - '3306:3306'
+      - 3306:3306
     environment:
       MYSQL_DATABASE: 'db'
       MYSQL_USER: 'user'
@@ -16,19 +23,24 @@ services:
   backend:
     build: ./
     container_name: backend
+    networks:
+      - app-network
     ports:
       - 3000:3000
-    network_mode: "host"
     depends_on:
       - db
+    links:
+      - db
 
-#  kanban-ui:
-#    build: ./kanban-ui
-#    container_name: kanban-ui
-#    ports:
-#      - 4200:80
-#    links:
-#      - kanban-app
+  frontend:
+    build: ../vkr-orlova/
+    container_name: frontend
+    networks:
+      - app-network
+    ports:
+      - 4200:96
+    links:
+      - backend
 
 volumes:
   dbdata:
