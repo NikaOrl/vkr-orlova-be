@@ -1,7 +1,4 @@
-const options = require('../env/db.config');
-const knex = require('knex')(options);
-
-const students = [
+export const students = [
   {
     id: '1',
     firstName: 'Иван',
@@ -9,8 +6,6 @@ const students = [
     numberInList: 1,
     email: 'ivan@stud.com',
     groupId: '1',
-    headStudent: 1,
-    deleted: 0,
   },
   {
     id: '2',
@@ -19,8 +14,6 @@ const students = [
     numberInList: 2,
     email: 'petr@stud.com',
     groupId: '1',
-    headStudent: 0,
-    deleted: 0,
   },
   {
     id: '3',
@@ -29,8 +22,6 @@ const students = [
     numberInList: 3,
     email: 'vasia@stud.com',
     groupId: '1',
-    headStudent: 0,
-    deleted: 0,
   },
   {
     id: '4',
@@ -39,8 +30,6 @@ const students = [
     numberInList: 1,
     email: 'serg@stud.com',
     groupId: '2',
-    headStudent: 0,
-    deleted: 0,
   },
   {
     id: '5',
@@ -49,8 +38,6 @@ const students = [
     numberInList: 4,
     email: 'tolya@stud.com',
     groupId: '1',
-    headStudent: 0,
-    deleted: 0,
   },
   {
     id: '6',
@@ -59,8 +46,6 @@ const students = [
     numberInList: 5,
     email: 'andrei@stud.com',
     groupId: '1',
-    headStudent: 0,
-    deleted: 0,
   },
   {
     id: '7',
@@ -69,8 +54,6 @@ const students = [
     numberInList: 6,
     email: 'sachar@stud.com',
     groupId: '1',
-    headStudent: 0,
-    deleted: 0,
   },
   {
     id: '8',
@@ -79,8 +62,6 @@ const students = [
     numberInList: 7,
     email: 'kostya@stud.com',
     groupId: '1',
-    headStudent: 0,
-    deleted: 0,
   },
   {
     id: '9',
@@ -89,8 +70,6 @@ const students = [
     numberInList: 8,
     email: 'kolya@stud.com',
     groupId: '1',
-    headStudent: 0,
-    deleted: 0,
   },
   {
     id: '10',
@@ -99,8 +78,6 @@ const students = [
     numberInList: 9,
     email: 'anton@stud.com',
     groupId: '1',
-    headStudent: 0,
-    deleted: 0,
   },
   {
     id: '11',
@@ -109,8 +86,6 @@ const students = [
     numberInList: 10,
     email: 'stenya@stud.com',
     groupId: '1',
-    headStudent: 0,
-    deleted: 0,
   },
   {
     id: '12',
@@ -119,8 +94,6 @@ const students = [
     numberInList: 2,
     email: 'boris@stud.com',
     groupId: '2',
-    headStudent: 0,
-    deleted: 0,
   },
   {
     id: '13',
@@ -129,8 +102,6 @@ const students = [
     numberInList: 3,
     email: 'vladislav@stud.com',
     groupId: '2',
-    headStudent: 0,
-    deleted: 0,
   },
   {
     id: '14',
@@ -139,8 +110,6 @@ const students = [
     numberInList: 4,
     email: 'vitya@stud.com',
     groupId: '2',
-    headStudent: 0,
-    deleted: 0,
   },
   {
     id: '15',
@@ -149,8 +118,6 @@ const students = [
     numberInList: 5,
     email: 'oleg@stud.com',
     groupId: '2',
-    headStudent: 0,
-    deleted: 0,
   },
   {
     id: '16',
@@ -159,8 +126,6 @@ const students = [
     numberInList: 6,
     email: 'sanya@stud.com',
     groupId: '2',
-    headStudent: 0,
-    deleted: 0,
   },
   {
     id: '17',
@@ -169,8 +134,6 @@ const students = [
     numberInList: 7,
     email: 'anatoli@stud.com',
     groupId: '2',
-    headStudent: 0,
-    deleted: 0,
   },
   {
     id: '18',
@@ -179,8 +142,6 @@ const students = [
     numberInList: 8,
     email: 'zhora@stud.com',
     groupId: '2',
-    headStudent: 0,
-    deleted: 0,
   },
   {
     id: '19',
@@ -189,8 +150,6 @@ const students = [
     numberInList: 1,
     email: 'georgii@stud.com',
     groupId: '3',
-    headStudent: 0,
-    deleted: 0,
   },
   {
     id: '20',
@@ -199,8 +158,6 @@ const students = [
     numberInList: 2,
     email: 'pasha@stud.com',
     groupId: '3',
-    headStudent: 0,
-    deleted: 0,
   },
   {
     id: '21',
@@ -209,8 +166,6 @@ const students = [
     numberInList: 3,
     email: 'vladya@stud.com',
     groupId: '3',
-    headStudent: 0,
-    deleted: 0,
   },
   {
     id: '22',
@@ -219,8 +174,6 @@ const students = [
     numberInList: 4,
     email: 'nil@stud.com',
     groupId: '3',
-    headStudent: 0,
-    deleted: 0,
   },
   {
     id: '23',
@@ -229,8 +182,6 @@ const students = [
     numberInList: 5,
     email: 'maksim@stud.com',
     groupId: '3',
-    headStudent: 0,
-    deleted: 0,
   },
   {
     id: '24',
@@ -239,8 +190,6 @@ const students = [
     numberInList: 6,
     email: 'maks@stud.com',
     groupId: '3',
-    headStudent: 0,
-    deleted: 0,
   },
   {
     id: '25',
@@ -249,8 +198,6 @@ const students = [
     numberInList: 7,
     email: 'vitya@stud.com',
     groupId: '3',
-    headStudent: 0,
-    deleted: 0,
   },
   {
     id: '26',
@@ -259,8 +206,6 @@ const students = [
     numberInList: 8,
     email: 'danya@stud.com',
     groupId: '3',
-    headStudent: 0,
-    deleted: 0,
   },
   {
     id: '27',
@@ -269,18 +214,5 @@ const students = [
     numberInList: 9,
     email: 'pasha@stud.com',
     groupId: '3',
-    headStudent: 0,
-    deleted: 0,
   },
 ];
-
-knex('students')
-  .insert(students)
-  .then(() => console.log('students inserted'))
-  .catch((err) => {
-    console.log(err);
-    throw err;
-  })
-  .finally(() => {
-    knex.destroy();
-  });

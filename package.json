@@ -19,8 +19,6 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
-    "tables:create": "cd tables && node create_tabels.js",
-    "tables:insert": "cd tables && node insert_data.js",
     "docker:db": "cd ./db && docker-compose up",
     "docker:db:down": "cd ./db && docker-compose down -v"
   },

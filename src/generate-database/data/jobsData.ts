@@ -1,7 +1,4 @@
-const options = require('../env/db.config');
-const knex = require('knex')(options);
-
-const jobs = [
+export const jobs = [
   {
     id: '1',
     disciplineId: '1',
@@ -120,14 +117,3 @@ const jobs = [
     deleted: false,
   },
 ];
-
-knex('jobs')
-  .insert(jobs)
-  .then(() => console.log('jobs inserted'))
-  .catch((err) => {
-    console.log(err);
-    throw err;
-  })
-  .finally(() => {
-    knex.destroy();
-  });
