@@ -12,6 +12,7 @@ import { marks } from './data/marksData';
 import { modules } from './data/modulesData';
 import { students } from './data/studentsData';
 import { teachers } from './data/teachersData';
+import { semesters } from './data/semestersData';
 
 @Injectable()
 export class GenerateDatabaseService {
@@ -335,7 +336,7 @@ export class GenerateDatabaseService {
     const knex = this.knexService.getKnex();
 
     knex('semesters')
-      .insert(disciplines)
+      .insert(semesters)
       .then(() => console.log('disciplines inserted'))
       .catch((err) => {
         console.log(err);

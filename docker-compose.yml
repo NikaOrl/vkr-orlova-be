@@ -33,8 +33,10 @@ services:
       - db
 
   frontend:
-    build: ../vkr-orlova/
+    image: nikaorl/vkr-orlova:latest
     container_name: frontend
+    environment:
+      - APP_SERVER=http://backend:3000
     networks:
       - app-network
     ports:

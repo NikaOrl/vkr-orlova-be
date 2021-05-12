@@ -12,16 +12,16 @@ jobs:
           node-version: '12'
       - run: npm install
       - run: npm run lint
-#      - name: Login to docker hub
-#        uses: actions-hub/docker/login@master
-#        env:
-#          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-#          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+      - name: Login to docker hub
+        uses: actions-hub/docker/login@master
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
 
-      # - name: Build :latest
-      #   run: docker build -t nikaorl/vkr-orlova:latest .
+      - name: Build :latest
+        run: npm run docker:build
 
-      # - name: Push to docker hub :latest
-      #   uses: actions-hub/docker@master
-      #   with:
-      #     args: push nikaorl/vkr-orlova:latest
+      - name: Push to docker hub :latest
+        uses: actions-hub/docker@master
+        with:
+          args: push nikaorl/vkr-orlova:latest

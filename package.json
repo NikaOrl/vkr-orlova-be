@@ -20,7 +20,9 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "docker:db": "cd ./db && docker-compose up",
-    "docker:db:down": "cd ./db && docker-compose down -v"
+    "docker:db:down": "cd ./db && docker-compose down -v",
+    "docker:build": "docker build -t nikaorl/vkr-orlova-be .",
+    "docker:run": " docker run --rm --it --publish 3000:3000 nikaorl/vkr-orlova"
   },
   "dependencies": {
     "@nestjs/common": "^7.6.13",
