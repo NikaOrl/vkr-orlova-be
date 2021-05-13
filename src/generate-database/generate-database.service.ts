@@ -5,7 +5,7 @@ import { KnexService } from '../knex/knex.service';
 import { attendanceMarks } from './data/attendanceMarksData';
 import { attendances } from './data/attendancesData';
 import { disciplines } from './data/disciplinesData';
-import { studentsDisciplines } from './data/disciplinesTeachersData';
+import { disciplinesTeachers } from './data/disciplinesTeachersData';
 import { groups } from './data/groupsData';
 import { jobs } from './data/jobsData';
 import { marks } from './data/marksData';
@@ -13,6 +13,7 @@ import { modules } from './data/modulesData';
 import { students } from './data/studentsData';
 import { teachers } from './data/teachersData';
 import { semesters } from './data/semestersData';
+import { studentsDisciplines } from './data/studentsDisciplinesData';
 
 @Injectable()
 export class GenerateDatabaseService {
@@ -276,7 +277,7 @@ export class GenerateDatabaseService {
     const knex = this.knexService.getKnex();
 
     knex('disciplines-teachers')
-      .insert(studentsDisciplines)
+      .insert(disciplinesTeachers)
       .then(() => console.log('disciplines-teachers inserted'))
       .catch((err) => {
         console.log(err);
