@@ -83,7 +83,7 @@ export class DisciplinesService {
     semesterId: string,
   ): Promise<IDisciplineWithTeachers[]> {
     const knex = this.knexService.getKnex();
-    // TODO переделать запрос. Если у дисциплины нет учителя
+
     const disciplinesTeachers = await knex<DisciplinesDB>('disciplines')
       .leftJoin(
         'disciplines-teachers',
