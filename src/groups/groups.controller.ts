@@ -6,9 +6,9 @@ import {
   Post,
   Put,
   Res,
-  UploadedFile,
-  UseInterceptors,
-} from '@nestjs/common';
+  UploadedFile, UploadedFiles,
+  UseInterceptors
+} from "@nestjs/common";
 import { Express, Response } from 'express';
 
 import { GroupsService } from './groups.service';
@@ -88,8 +88,9 @@ export class GroupsController {
   }
 
   @Post(':groupId/table')
-  @UseInterceptors(AnyFilesInterceptor())
-  uploadFile(@UploadedFile() file: Express.Multer.File) {
+  @UseInterceptors(FileInterceptor('file'))
+  async uploadFile(@UploadedFile() file: Express.Multer.File) {
     console.log(file);
+    await this.groupsService.uploadStudentsFromFile(file);
   }
 }

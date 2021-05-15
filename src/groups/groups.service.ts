@@ -17,6 +17,21 @@ const TableColumns = {
   HEAD_STUDENT: 'headStudent',
 };
 
+const UploadTableFields = {
+  FIO: 'ФИО',
+  GROUP: 'Группа',
+  EMAIL: 'Email',
+};
+
+//   [
+//   <1 empty item>, 'Студ. билет',
+//   'ФИО',          'Номер дела',
+//   'Факультет',    'Направление',
+//   'Форма',        'Ист. фин.',
+//   'Группа',       'Начало',
+//   'Конец',        'Email'
+// ],
+
 export interface IStudentsGroupTable {
   stream: Buffer;
   groupNumber: string;
@@ -160,5 +175,35 @@ export class GroupsService {
       stream,
       groupNumber: group.groupNumber,
     };
+  }
+
+  async uploadStudentsFromFile(file): Promise<void> {
+    const table = await this.generateTableService.parseExcel(file.buffer);
+
+    const fields = R.head(table);
+    const tableData = R.drop(1, table);
+
+    const fioIndex = R.findIndex(R.equals(UploadTableFields.FIO), fields);
+    const groupIndex = R.findIndex(R.equals(UploadTableFields.GROUP), fields);
+    const emailIndex = R.findIndex(R.equals(UploadTableFields.EMAIL), fields);
+
+    const students = R.pipe(
+      R.map((studentData) => ({
+        fio: studentData[fioIndex],
+        group: studentData[groupIndex],
+        email: studentData[emailIndex],
+      })),
+      R.map(({ fio, ...data }) => {
+        const [lastName, firstName] = fio.split(' ');
+
+        return {
+          firstName,
+          lastName,
+          ...data,
+        };
+      }),
+    )(tableData);
+
+    console.log(students);
   }
 }

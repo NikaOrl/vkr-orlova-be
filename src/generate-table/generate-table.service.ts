@@ -29,4 +29,20 @@ export class GenerateTableService {
       console.log(e);
     }
   }
+
+  async parseExcel(fileBuffer) {
+    const wb = new excel.Workbook();
+    const workbook = await wb.xlsx.load(fileBuffer);
+
+    const table = [];
+
+    workbook.eachSheet((sheet, id) => {
+      sheet.eachRow((row, rowIndex) => {
+        table.push(row.values);
+        // console.log(row.values, rowIndex);
+      });
+    });
+
+    return table;
+  }
 }
