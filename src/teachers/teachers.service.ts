@@ -1,7 +1,8 @@
 import * as R from 'ramda';
 import { v4 as uuid } from 'uuid';
 import { Injectable } from '@nestjs/common';
-import bcrypt from 'bcryptjs';
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const bcrypt = require('bcryptjs');
 
 import { KnexService } from '../knex/knex.service';
 
