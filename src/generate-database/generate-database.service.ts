@@ -67,6 +67,7 @@ export class GenerateDatabaseService {
         table.integer('three').defaultTo(10);
         table.integer('four').defaultTo(20);
         table.integer('five').defaultTo(30);
+        table.boolean('countAsAverage').defaultTo(false);
         table.boolean('countWithAttendance').defaultTo(true);
         table.boolean('deleted').defaultTo(false);
       })
