@@ -83,7 +83,7 @@ export class DisciplinesService {
     semesterId: string,
   ): Promise<IDisciplineWithTeachers[]> {
     const knex = this.knexService.getKnex();
-    // TODO переделать запрос. Если у дисциплины нет учителя
+
     const disciplinesTeachers = await knex<DisciplinesDB>('disciplines')
       .leftJoin(
         'disciplines-teachers',
@@ -97,6 +97,7 @@ export class DisciplinesService {
         'teacherId',
         'attendanceWeight',
         'countWithAttendance',
+        'countAsAverage',
         'five',
         'four',
         'three',
@@ -125,6 +126,7 @@ export class DisciplinesService {
               disciplineValue: disciplineWithTeachers.disciplineValue,
               attendanceWeight: disciplineWithTeachers.attendanceWeight,
               countWithAttendance: disciplineWithTeachers.countWithAttendance,
+              countAsAverage: disciplineWithTeachers.countAsAverage,
               semesterId: disciplineWithTeachers.semesterId,
               marksAreas: {
                 five: disciplineWithTeachers.five,
@@ -176,6 +178,8 @@ export class DisciplinesService {
       disciplineValue: disciplineWithTeachers.disciplineValue,
       attendanceWeight: disciplineWithTeachers.attendanceWeight,
       countWithAttendance: disciplineWithTeachers.countWithAttendance,
+      countAsAverage: disciplineWithTeachers.countAsAverage,
+
       semesterId: disciplineWithTeachers.semesterId,
       ...disciplineWithTeachers.marksAreas,
     };
@@ -203,6 +207,7 @@ export class DisciplinesService {
       disciplineValue: disciplineWithTeachers.disciplineValue,
       attendanceWeight: disciplineWithTeachers.attendanceWeight,
       countWithAttendance: disciplineWithTeachers.countWithAttendance,
+      countAsAverage: disciplineWithTeachers.countAsAverage,
       semesterId: disciplineWithTeachers.semesterId,
       ...disciplineWithTeachers.marksAreas,
     };

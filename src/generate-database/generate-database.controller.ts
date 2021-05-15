@@ -2,6 +2,8 @@ import { Controller, Get } from '@nestjs/common';
 
 import { GenerateDatabaseService } from './generate-database.service';
 
+import { ResultStatus } from '../../common/types/ResultStatus';
+
 @Controller('generate-database')
 export class GenerateDatabaseController {
   constructor(
@@ -9,7 +11,7 @@ export class GenerateDatabaseController {
   ) {}
 
   @Get('create')
-  async createTables(): Promise<void> {
+  async createTables(): Promise<ResultStatus> {
     await this.generateDatabaseService.createAttendanceMarksTable();
     await this.generateDatabaseService.createAttendancesTable();
     await this.generateDatabaseService.createDisciplinesTable();
@@ -22,10 +24,14 @@ export class GenerateDatabaseController {
     await this.generateDatabaseService.createStudentsDisciplinesTable();
     await this.generateDatabaseService.createStudentsTable();
     await this.generateDatabaseService.createTeachersTable();
+
+    return {
+      status: 'success',
+    };
   }
 
   @Get('insert')
-  async insertDataToTables(): Promise<void> {
+  async insertDataToTables(): Promise<ResultStatus> {
     await this.generateDatabaseService.insertAttendanceMarksTable();
     await this.generateDatabaseService.insertAttendancesTable();
     await this.generateDatabaseService.insertDisciplinesTable();
@@ -38,5 +44,9 @@ export class GenerateDatabaseController {
     await this.generateDatabaseService.insertStudentsDisciplinesTable();
     await this.generateDatabaseService.insertStudentsTable();
     await this.generateDatabaseService.insertTeachersTable();
+
+    return {
+      status: 'success',
+    };
   }
 }

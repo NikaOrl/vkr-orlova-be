@@ -27,9 +27,10 @@ export class StudentsDisciplinesService {
   ): Promise<void> {
     const knex = this.knexService.getKnex();
 
-    const studentsWithDisciplineIdToAdd = R.map(
-      R.set(R.lensProp('id'), uuid()),
-    )(studentsWithDisciplineId);
+    const studentsWithDisciplineIdToAdd = R.map((data) => ({
+      id: uuid(),
+      ...data,
+    }))(studentsWithDisciplineId);
 
     await knex<StudentDisciplineDB>('students-disciplines').insert(
       studentsWithDisciplineIdToAdd,
