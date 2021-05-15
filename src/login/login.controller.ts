@@ -20,7 +20,8 @@ export class LoginController {
         token: token,
         isAdmin: isAdmin,
       });
-    } catch (_) {
+    } catch (e) {
+      console.log(e);
       res.status(500).send('Wrong credentials');
     }
   }

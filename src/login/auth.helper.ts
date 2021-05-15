@@ -1,6 +1,8 @@
 import * as moment from 'moment';
-import bcrypt from 'bcryptjs';
-import jwt from 'jwt-simple';
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const bcrypt = require('bcryptjs');
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const jwt = require('jwt-simple');
 
 export const encodeToken = (user) => {
   const playload = {
