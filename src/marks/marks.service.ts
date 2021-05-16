@@ -11,10 +11,20 @@ import { JobDB } from '../jobs/jobs.interface';
 import { ModuleDB } from '../modules/modules.interface';
 import { StudentDisciplineDB } from '../students-disciplines/students-disciplines.interface';
 import { AttendanceMarksDB } from '../attendance-marks/attendanceMarks.interface';
+import { GenerateTableService } from '../generate-table/generate-table.service';
+import { orderedByModuleJobs, parseGetMarksResult } from "./marks.helper";
 
 export interface IJobsWithMarks extends JobDB {
   marks: MarkDB[];
 }
+
+const TableColumns = {
+  STUDENT_NAME: 'studentName',
+  ATTENDANCE: 'attendance',
+  ATTENDANCE_POINTS: 'attendancePoints',
+  SUM_POINTS: 'sumPoints',
+  RESULT_CELL_MARK: 'resultCellMark',
+};
 
 @Injectable()
 export class MarksService {
@@ -22,6 +32,7 @@ export class MarksService {
     private readonly knexService: KnexService,
     private readonly jobsService: JobsService,
     private readonly disciplinesService: DisciplinesService,
+    private readonly generateTableService: GenerateTableService,
   ) {}
 
   async getMarks(disciplineId: string, groupId: string): Promise<any> {
@@ -125,6 +136,7 @@ export class MarksService {
     const {
       attendanceWeight,
       countWithAttendance,
+      countAsAverage,
       three,
       four,
       five,
@@ -134,6 +146,7 @@ export class MarksService {
       maxAttendance,
       attendanceWeight,
       countWithAttendance,
+      countAsAverage,
       marksAreas: {
         five,
         four,
@@ -214,5 +227,116 @@ export class MarksService {
     }
 
     return await this.updateMark(markData.id, markData);
+  }
+
+  async getMarksExcelTable(
+    disciplineId: string,
+    groupId: string,
+  ): Promise<any> {
+    const data = await this.getMarks(disciplineId, groupId);
+
+    const getModuleName = (moduleId) =>
+      R.pipe(
+        R.find(R.propEq('id', moduleId)),
+        R.prop('moduleName'),
+      )(data.modules);
+
+    const jobsColumns = data.jobs.map((job) => ({
+      key: job.id,
+      width: 10,
+    }));
+
+    const jobsHeaders = data.jobs.reduce(
+      (acc, job) => ({
+        ...acc,
+        [job.id]: job.jobValue,
+      }),
+      {},
+    );
+
+    const columnsBase = [
+      { key: TableColumns.STUDENT_NAME, width: 35 },
+      ...jobsColumns,
+      { key: TableColumns.ATTENDANCE, width: 10 },
+      { key: TableColumns.ATTENDANCE_POINTS, width: 10 },
+      { key: TableColumns.SUM_POINTS, width: 10 },
+      { key: TableColumns.RESULT_CELL_MARK, width: 10 },
+    ];
+
+    const firstRow = data.jobs.reduce((acc, job) => {
+      return {
+        ...acc,
+        [job.id]: getModuleName(job.moduleId),
+      };
+    }, {});
+
+    const secondRow = {
+      [TableColumns.STUDENT_NAME]: 'Студент',
+      [TableColumns.ATTENDANCE]: 'Посещаемость',
+      [TableColumns.ATTENDANCE_POINTS]: 'Баллы за посещаемость',
+      [TableColumns.SUM_POINTS]: 'Итоговый балл',
+      [TableColumns.RESULT_CELL_MARK]: 'Итоговая оценка',
+      ...jobsHeaders,
+    };
+
+    const attendanceWeight = data.attendanceWeight;
+    const countWithAttendance = data.countWithAttendance;
+    const countAsAverage = data.countAsAverage;
+    const marksAreas = data.marksAreas;
+
+    const jobs = data.jobs.sort((j1, j2) =>
+      j1.moduleId === j2.moduleId ? j1.numberInList - j2.numberInList : 0,
+    );
+
+    const modules = data.modules.sort(
+      (m1, m2) => m1.numberInList - m2.numberInList,
+    );
+
+    const { orderedJobs, orderedModules } = orderedByModuleJobs(modules, jobs);
+
+    const rows = parseGetMarksResult({
+      students: data.students,
+      jobs: orderedJobs,
+      modules: orderedModules,
+      attendanceWeight,
+      countAsAverage,
+      countWithAttendance,
+      marksAreas,
+    });
+
+    let START_COLUMN = 2;
+    const ROW = 1;
+
+    const mergeCells = orderedModules.map(({ numberOfJobs }): [
+      number,
+      number,
+      number,
+      number,
+    ] => {
+      const endColumn = START_COLUMN + numberOfJobs - 1;
+
+      const merge: [number, number, number, number] = [
+        ROW,
+        START_COLUMN,
+        ROW,
+        endColumn,
+      ];
+
+      START_COLUMN = endColumn + 1;
+
+      return merge;
+    });
+
+    const columns = R.ifElse(
+      R.always(!countWithAttendance),
+      R.filter(R.complement(R.propEq('key', TableColumns.ATTENDANCE_POINTS))),
+      R.always,
+    )(columnsBase);
+
+    return await this.generateTableService.createCustomExcel(
+      columns,
+      [firstRow, secondRow, ...rows],
+      mergeCells,
+    );
   }
 }

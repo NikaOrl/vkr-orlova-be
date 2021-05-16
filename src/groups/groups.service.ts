@@ -17,6 +17,12 @@ const TableColumns = {
   HEAD_STUDENT: 'headStudent',
 };
 
+const UploadTableFields = {
+  FIO: 'ФИО',
+  GROUP: 'Группа',
+  EMAIL: 'Email',
+};
+
 export interface IStudentsGroupTable {
   stream: Buffer;
   groupNumber: string;
@@ -25,6 +31,8 @@ export interface IStudentsGroupTable {
 export interface IGroupWithStudents extends GroupDB {
   students: StudentDB[];
 }
+
+const mapIndexed = R.addIndex(R.map);
 
 @Injectable()
 export class GroupsService {
@@ -38,6 +46,16 @@ export class GroupsService {
     const knex = this.knexService.getKnex();
 
     return knex<GroupDB>('groups').select('*');
+  }
+
+  async findGroupByGroupNumber(groupNumber: string): Promise<GroupDB> {
+    const knex = this.knexService.getKnex();
+
+    const [group] = await knex<GroupDB>('groups')
+      .where('groupNumber', groupNumber)
+      .select('*');
+
+    return group;
   }
 
   async getGroupsByIds(ids: string[]): Promise<GroupDB[]> {
@@ -160,5 +178,71 @@ export class GroupsService {
       stream,
       groupNumber: group.groupNumber,
     };
+  }
+
+  async uploadStudentsFromFile(file): Promise<void> {
+    const table = await this.generateTableService.parseExcel(file.buffer);
+
+    const fields = R.head(table);
+    const tableData = R.drop(1, table);
+
+    const fioIndex = R.findIndex(R.equals(UploadTableFields.FIO), fields);
+    const groupIndex = R.findIndex(R.equals(UploadTableFields.GROUP), fields);
+    const emailIndex = R.findIndex(R.equals(UploadTableFields.EMAIL), fields);
+
+    const students = R.pipe(
+      R.map((studentData) => ({
+        fio: studentData[fioIndex],
+        group: studentData[groupIndex].toString(),
+        email: studentData[emailIndex],
+      })),
+      R.map(({ fio, ...data }) => {
+        const [lastName, firstName] = fio.split(' ');
+
+        return {
+          firstName,
+          lastName,
+          ...data,
+        };
+      }),
+    )(tableData);
+
+    const updateStudents = R.pipe(
+      R.map(R.omit(['group'])),
+      mapIndexed((student, index) => ({
+        ...student,
+        numberInList: index,
+      })),
+    );
+
+    const groupsWithStudents = R.pipe(
+      R.groupBy(R.prop('group')),
+      R.toPairs,
+      R.map(([groupNumber, students]) => ({
+        groupNumber,
+        students: updateStudents(students),
+      })),
+    )(students);
+
+    await Promise.all(
+      groupsWithStudents.map(async (groupsWithStudent) => {
+        const group = await this.findGroupByGroupNumber(
+          groupsWithStudent.groupNumber,
+        );
+        console.log(group, R.isNil(group));
+
+        if (R.isNil(group)) {
+          await this.createGroupWithStudents(groupsWithStudent);
+
+          return;
+        }
+
+        const studentsToAdd = R.map(R.set(R.lensProp('groupId'), group.id))(
+          groupsWithStudent.students,
+        );
+
+        await this.studentsService.createStudents(studentsToAdd);
+      }),
+    );
   }
 }
