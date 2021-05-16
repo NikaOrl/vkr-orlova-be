@@ -12,7 +12,7 @@ import { ModuleDB } from '../modules/modules.interface';
 import { StudentDisciplineDB } from '../students-disciplines/students-disciplines.interface';
 import { AttendanceMarksDB } from '../attendance-marks/attendanceMarks.interface';
 import { GenerateTableService } from '../generate-table/generate-table.service';
-import { orderedByModuleJobs, parseGetMarksResult } from "./marks.helper";
+import { orderedByModuleJobs, parseGetMarksResult } from './marks.helper';
 
 export interface IJobsWithMarks extends JobDB {
   marks: MarkDB[];
@@ -330,7 +330,7 @@ export class MarksService {
     const columns = R.ifElse(
       R.always(!countWithAttendance),
       R.filter(R.complement(R.propEq('key', TableColumns.ATTENDANCE_POINTS))),
-      R.always,
+      R.always(columnsBase),
     )(columnsBase);
 
     return await this.generateTableService.createCustomExcel(
