@@ -19,6 +19,39 @@ export class GenerateTableService {
         sheet.addRow(rows[i]);
       }
 
+      sheet.mergeCells([2, 1, 4, 1]);
+      sheet.commit();
+      await workbook.commit();
+
+      const stream: any = (workbook as any).stream;
+
+      return stream.read();
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
+  async createCustomExcel(
+    columns: Partial<excel.Column>[],
+    rows: any[],
+    mergeCells: [number, number, number, number][],
+  ): Promise<Buffer> {
+    try {
+      const workbook: excel.stream.xlsx.WorkbookWriter = new excel.stream.xlsx.WorkbookWriter(
+        {},
+      );
+
+      const sheet: excel.Worksheet = workbook.addWorksheet('My Worksheet');
+      sheet.columns = columns;
+
+      rows.forEach((row) => {
+        sheet.addRow(row);
+      });
+
+      mergeCells.forEach((cellsStartEnd) => {
+        sheet.mergeCells(cellsStartEnd);
+      });
+
       sheet.commit();
       await workbook.commit();
 
