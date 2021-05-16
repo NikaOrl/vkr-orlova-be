@@ -90,7 +90,6 @@ export class GroupsController {
   @Post(':groupId/table')
   @UseInterceptors(FileInterceptor('file'))
   async uploadFile(@UploadedFile() file: Express.Multer.File) {
-    console.log(file);
     await this.groupsService.uploadStudentsFromFile(file);
   }
 }

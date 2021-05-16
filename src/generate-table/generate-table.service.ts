@@ -19,7 +19,6 @@ export class GenerateTableService {
         sheet.addRow(rows[i]);
       }
 
-      sheet.mergeCells([2, 1, 4, 1]);
       sheet.commit();
       await workbook.commit();
 
@@ -72,7 +71,6 @@ export class GenerateTableService {
     workbook.eachSheet((sheet, id) => {
       sheet.eachRow((row, rowIndex) => {
         table.push(row.values);
-        // console.log(row.values, rowIndex);
       });
     });
 

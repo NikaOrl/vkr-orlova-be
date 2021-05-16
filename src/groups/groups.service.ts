@@ -23,15 +23,6 @@ const UploadTableFields = {
   EMAIL: 'Email',
 };
 
-//   [
-//   <1 empty item>, 'Студ. билет',
-//   'ФИО',          'Номер дела',
-//   'Факультет',    'Направление',
-//   'Форма',        'Ист. фин.',
-//   'Группа',       'Начало',
-//   'Конец',        'Email'
-// ],
-
 export interface IStudentsGroupTable {
   stream: Buffer;
   groupNumber: string;
