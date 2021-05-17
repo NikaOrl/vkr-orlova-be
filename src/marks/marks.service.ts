@@ -12,7 +12,12 @@ import { ModuleDB } from '../modules/modules.interface';
 import { StudentDisciplineDB } from '../students-disciplines/students-disciplines.interface';
 import { AttendanceMarksDB } from '../attendance-marks/attendanceMarks.interface';
 import { GenerateTableService } from '../generate-table/generate-table.service';
-import { orderedByModuleJobs, parseGetMarksResult } from './marks.helper';
+import {
+  getResultMark, getSumMaxPoints,
+  getSumPoints,
+  orderedByModuleJobs,
+  parseGetMarksResult
+} from "./marks.helper";
 
 export interface IJobsWithMarks extends JobDB {
   marks: MarkDB[];
@@ -254,6 +259,14 @@ export class MarksService {
       {},
     );
 
+    const jobsMaxPoint = data.jobs.reduce(
+      (acc, job) => ({
+        ...acc,
+        [job.id]: job.maxPoint,
+      }),
+      {},
+    );
+
     const columnsBase = [
       { key: TableColumns.STUDENT_NAME, width: 35 },
       ...jobsColumns,
@@ -280,6 +293,7 @@ export class MarksService {
     };
 
     const attendanceWeight = data.attendanceWeight;
+    const maxAttendance = data.maxAttendance;
     const countWithAttendance = data.countWithAttendance;
     const countAsAverage = data.countAsAverage;
     const marksAreas = data.marksAreas;
@@ -333,9 +347,28 @@ export class MarksService {
       R.always(columnsBase),
     )(columnsBase);
 
+    const maxAttendancePointsNumber = maxAttendance * attendanceWeight
+
+    const sumPoints = getSumMaxPoints(
+      jobs,
+      countAsAverage,
+      countWithAttendance,
+      modules,
+      maxAttendancePointsNumber,
+    );
+
+    const thirdRow = {
+      [TableColumns.STUDENT_NAME]: 'Максимальный балл',
+      [TableColumns.ATTENDANCE]: maxAttendance,
+      [TableColumns.ATTENDANCE_POINTS]: maxAttendancePointsNumber,
+      [TableColumns.SUM_POINTS]: sumPoints,
+      [TableColumns.RESULT_CELL_MARK]: getResultMark(sumPoints, marksAreas),
+      ...jobsMaxPoint,
+    };
+
     return await this.generateTableService.createCustomExcel(
       columns,
-      [firstRow, secondRow, ...rows],
+      [firstRow, secondRow, thirdRow, ...rows],
       mergeCells,
     );
   }

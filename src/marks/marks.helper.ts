@@ -1,4 +1,4 @@
-const getResultMark = (sumPoints: number, marksAreas): string => {
+export const getResultMark = (sumPoints: number, marksAreas): string => {
   if (marksAreas) {
     if (sumPoints < marksAreas.three) {
       return 'неуд.';
@@ -12,11 +12,31 @@ const getResultMark = (sumPoints: number, marksAreas): string => {
   }
 };
 
+export const getSumMaxPoints = (
+  jobs,
+  countAsAverage,
+  countWithAttendance,
+  modules,
+  maxAttendancePointsNumber,
+): number => {
+  let sumPoints = 0;
+  jobs.forEach((job) => {
+    sumPoints += job.maxPoint;
+  });
+  if (countAsAverage) {
+    sumPoints = +(sumPoints / modules.length).toFixed(2);
+  }
+  if (countWithAttendance) {
+    sumPoints += maxAttendancePointsNumber;
+  }
+  return sumPoints;
+};
+
 const getAttendancePoints = (attendance, attendanceWeight): number => {
   return attendance * attendanceWeight;
 };
 
-const getSumPoints = (
+export const getSumPoints = (
   element,
   attendance: number,
   attendanceWeight,
